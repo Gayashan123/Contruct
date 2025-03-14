@@ -23,7 +23,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/basic-prices">
+              <Link href="/Basic-prices">
                 <span className="hover:text-gray-300 cursor-pointer">Basic Prices</span>
               </Link>
             </li>

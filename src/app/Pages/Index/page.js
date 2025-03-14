@@ -4,8 +4,8 @@ import React from 'react';
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
 import Image from 'next/image'; // Importing Next.js Image component
-import Contact from '../Contact-us/page';
-import About from '../About-us/page';
+import Contact from '../contact-us/page';
+import About from '../about-us/page';
 
 
 export default function Index() {
