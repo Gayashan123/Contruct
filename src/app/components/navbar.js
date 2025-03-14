@@ -7,10 +7,12 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
 
   return (
-    <div className="bg-gray-800 text-white p-4 shadow-lg ">
+    <div className="bg-gray-800 text-white p-4 shadow-lg">
       <div className="flex justify-between items-center">
         {/* Logo or brand name */}
-        <div className="text-xl font-bold hover:text-gray-300 cursor-pointer"></div>
+        <div className="text-xl font-bold hover:text-gray-300 cursor-pointer">
+          Your Brand
+        </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
@@ -61,7 +63,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/contact">
+              <Link href=".\Basic-prices\page.js">
                 <span className="hover:text-gray-300 cursor-pointer">Contact</span>
               </Link>
             </li>
@@ -80,6 +82,7 @@ export default function Navbar() {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-label="Menu"
             >
               <path
                 strokeLinecap="round"
@@ -96,53 +99,37 @@ export default function Navbar() {
       <div
         className={`${
           isMenuOpen ? 'block' : 'hidden'
-        } md:hidden mt-4 space-y-4`}
+        } md:hidden mt-4 space-y-4 transition-all duration-300 ease-in-out`}
       >
         <ul className="flex flex-col space-y-4">
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/">
+            <Link href="/" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Home</span>
             </Link>
           </li>
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/basic-prices">
+            <Link href="/basic-prices" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Basic Prices</span>
             </Link>
           </li>
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/basic-rates">
+            <Link href="/basic-rates" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Basic Rates</span>
             </Link>
           </li>
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/activities">
+            <Link href="/activities" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Activities</span>
             </Link>
           </li>
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/search">
+            <Link href="/search" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Search</span>
             </Link>
           </li>
           <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/contact">
+            <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
               <span className="hover:text-gray-300 cursor-pointer">Contact</span>
-            </Link>
-          </li>
-          {/* Category Links in Mobile */}
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/category/materials">
-              <span className="hover:text-gray-300 cursor-pointer">Materials</span>
-            </Link>
-          </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/category/labour">
-              <span className="hover:text-gray-300 cursor-pointer">Labour</span>
-            </Link>
-          </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/category/plant">
-              <span className="hover:text-gray-300 cursor-pointer">Plant</span>
             </Link>
           </li>
         </ul>

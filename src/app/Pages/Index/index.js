@@ -1,9 +1,12 @@
+'use client ;'
+
 import React from 'react';
-import Navbar from '../components/navbar';
-import Footer from '../components/footer';
+import Navbar from '../../components/navbar';
+import Footer from '../../components/footer';
 import Image from 'next/image'; // Importing Next.js Image component
-import Contact from './contact';
-import About from './about';
+import Contact from '../Contact-us/page';
+import About from '../About-us/page';
+
 
 export default function Index() {
   return (
@@ -51,6 +54,12 @@ export default function Index() {
       <div className="my-16"> {/* Added margin for spacing */}
         <About />
       </div>
+
+
+
+
+
+
 
       <Footer />
     </div>
