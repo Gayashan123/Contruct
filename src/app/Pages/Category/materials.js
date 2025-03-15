@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Materials() {
-  const [materialsData, setMaterialsData] = useState([
-    { Item_No: 0, description: 'Painter', Code_no: 'M-001', unit: 'Day', price: '200.00' },
-    { Item_No: 1, description: 'Plumber', Code_no: 'M-002', unit: 'Day', price: '500.00' },
-    { Item_No: 2, description: 'SK Labour', Code_no: 'M-003', unit: 'Day', price: '600.00' },
-    { Item_No: 3, description: 'SK Labour (Vibrator)', Code_no: 'M-004', unit: 'Day', price: '650.00' },
-    { Item_No: 4, description: 'Tinker', Code_no: 'M-005', unit: 'Day', price: '700.00' },
-    { Item_No: 5, description: 'Tiler', Code_no: 'M-006', unit: 'Day', price: '50.00' },
-  ]);
+  const [materialsData, setMaterialsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchMaterialsData = async () => {
+      try {
+        const response = await fetch('/api/material');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        setMaterialsData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMaterialsData();
+  }, []);
 
   const addMaterial = () => {
     const newItemNo = materialsData.length;
     const newCodeNo = `M-${String(newItemNo + 1).padStart(3, '0')}`;
-    setMaterialsData([...materialsData, { Item_No: newItemNo, description: '', Code_no: newCodeNo, unit: 'Day', price: '' }]);
+    setMaterialsData([...materialsData, { itemNo: newItemNo, description: '', codeNo: newCodeNo, unit: 'Day', price: '' }]);
   };
 
   const updatePrice = (index, newPrice) => {
@@ -31,13 +45,21 @@ export default function Materials() {
     console.log("Saved Data:", materialsData);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       {/* Hero Section */}
       <div className="flex justify-center items-center py-12 text-white shadow-lg bg-gradient-to-r from-green-800 via-brown-700 to-gray-700 rounded-lg">
         <h1 className="text-4xl font-bold uppercase">Materials Table</h1>
       </div>
-      
+
       {/* Table */}
       <div className="mt-8 overflow-x-auto">
         <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
@@ -53,9 +75,9 @@ export default function Materials() {
           </thead>
           <tbody>
             {materialsData.map((material, index) => (
-              <tr key={material.Item_No} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">{material.Item_No}</td>
-                <td className="p-3">{material.Code_no}</td>
+              <tr key={material.itemNo} className="border-b text-center hover:bg-gray-200">
+                <td className="p-3">{material.itemNo}</td>
+                <td className="p-3">{material.codeNo}</td>
                 <td className="p-3">
                   <input
                     type="text"
