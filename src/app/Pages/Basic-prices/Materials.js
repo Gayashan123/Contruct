@@ -1,89 +1,130 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState, useEffect } from "react";
 
 export default function Materials() {
-  // State to hold the materials data
   const [materialsData, setMaterialsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch materials data from the API when the component mounts
   useEffect(() => {
-    const fetchMaterialsData = async () => {
-      try {
-        const response = await fetch('/api/materials', {
-          method: 'GET',
-        });
-        const result = await response.json();
-        
-        if (response.ok) {
-          setMaterialsData(result);  // Set the materials data from the response
-        } else {
-          alert('Failed to fetch materials data: ' + result.message);
-        }
-      } catch (error) {
-        alert('Error fetching data: ' + error.message);
-        console.error('Error:', error);
-      }
-    };
-
-    fetchMaterialsData();
+    loadMaterialsData();
   }, []);
+
+  const loadMaterialsData = async () => {
+    try {
+      const response = await fetch("/api/materials"); // Fetch the materials data from backend
+      const result = await response.json();
+      if (response.ok) {
+        setMaterialsData(result.data); // Populate state with fetched data
+      } else {
+        setMaterialsData([]); // Handle any errors by setting an empty array
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setMaterialsData([]); // Handle errors in fetching
+    } finally {
+      setIsLoading(false); // Stop the loading indicator when data is ready
+    }
+  };
 
   // Add a new material
   const addMaterial = () => {
-    setMaterialsData([
-      ...materialsData,
-      { trade: 'CONCRETE', material: '', unit: '', price: '' },
-    ]);
+    const newMaterial = {
+      Trade: "", // Empty trade (should be filled)
+      Material: "", // Empty material name (should be filled)
+      unit: "", // Empty unit (should be filled)
+      basic_price: "", // Empty price (should be filled)
+      isNew: true,
+      _id: `temp-${Date.now()}`, // Temporary ID for new data
+    };
+    setMaterialsData([...materialsData, newMaterial]);
+    setHasChanges(true); // Track changes
   };
 
-  // Update the price of a material
-  const updatePrice = (index, newPrice) => {
-    const updatedMaterials = [...materialsData];
-    updatedMaterials[index].price = newPrice;
-    setMaterialsData(updatedMaterials);
-  };
-
-  // Delete a material
-  const deleteRow = (index) => {
-    const updatedMaterials = materialsData.filter((_, i) => i !== index);
-    setMaterialsData(updatedMaterials);
+  // Update material data
+  const updateMaterial = (index, key, value) => {
+    setMaterialsData((prev) =>
+      prev.map((material, i) =>
+        i === index ? { ...material, [key]: value } : material
+      )
+    );
+    setHasChanges(true); // Track changes
   };
 
   // Save materials data to the API
   const saveData = async () => {
+    // Ensure all required fields are filled
+    if (materialsData.some((material) => !material.Trade || !material.Material || !material.unit || material.basic_price == null)) {
+      alert("Please fill all fields before saving.");
+      return;
+    }
+
     try {
-      const response = await fetch('/api/materials', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(materialsData),
+      const formattedData = materialsData.map(({ isNew, _id, ...rest }) => rest); // Remove temp _id
+      const response = await fetch("/api/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData), // Send updated data to the backend
       });
 
       const result = await response.json();
-
       if (response.ok) {
-        alert('Data saved successfully!');
-        console.log('Success:', result.message);
+        alert("Data saved successfully!");
+        loadMaterialsData(); // Reload the data after saving
+        setHasChanges(false);
       } else {
-        alert('Failed to save data: ' + result.message);
-        console.log('Error:', result.message);
+        alert("Failed to save: " + result.message);
       }
     } catch (error) {
-      alert('Error occurred: ' + error.message);
-      console.error('Error:', error);
+      console.error("Save error:", error);
+      alert("Error saving data");
     }
+  };
+
+  // Delete a material
+  const deleteRow = async (index) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this material?");
+    if (!confirmDelete) return;
+
+    const id = materialsData[index]._id;
+    if (!id.startsWith("temp-")) {
+      try {
+        const response = await fetch(`/api/materials?id=${id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Failed to delete");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("Error deleting material");
+        return;
+      }
+    }
+    setMaterialsData((prev) => prev.filter((_, i) => i !== index)); // Remove the row from the state
+    setHasChanges(true);
   };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      {/* Hero Section */}
-      <div className="flex justify-center items-center py-12 text-white shadow-lg bg-gradient-to-r from-blue-800 via-gray-700 to-gray-600 rounded-lg">
-        <h1 className="text-4xl font-bold uppercase">Materials Table</h1>
-      </div>
+      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Materials Table</h1>
 
-      {/* Table */}
-      <div className="mt-8 overflow-x-auto">
-        <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
+      <button onClick={addMaterial} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+        Add Material
+      </button>
+
+      {hasChanges && (
+        <button onClick={saveData} className="ml-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
+          Save Changes
+        </button>
+      )}
+
+      {isLoading ? (
+        <p className="text-center mt-4">Loading data...</p>
+      ) : (
+        <table className="w-full mt-4 border bg-white shadow-md">
           <thead className="bg-gray-700 text-white">
             <tr>
               <th className="p-3">Trade</th>
@@ -95,23 +136,41 @@ export default function Materials() {
           </thead>
           <tbody>
             {materialsData.map((material, index) => (
-              <tr key={index} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">{material.trade}</td>
-                <td className="p-3">{material.material}</td>
-                <td className="p-3">{material.unit}</td>
+              <tr key={material._id || `temp-${index}`} className="border-b text-center hover:bg-gray-200">
                 <td className="p-3">
                   <input
-                    type="number"
-                    className="w-full p-2 border rounded"
-                    value={material.price}
-                    onChange={(e) => updatePrice(index, e.target.value)}
+                    type="text"
+                    value={material.Trade || ""} // Ensure the value is never undefined
+                    onChange={(e) => updateMaterial(index, "Trade", e.target.value)}
+                    className="border p-2 w-full"
                   />
                 </td>
                 <td className="p-3">
-                  <button
-                    onClick={() => deleteRow(index)}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
+                  <input
+                    type="text"
+                    value={material.Material || ""} // Ensure the value is never undefined
+                    onChange={(e) => updateMaterial(index, "Material", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={material.unit || ""} // Ensure the value is never undefined
+                    onChange={(e) => updateMaterial(index, "unit", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="number"
+                    value={material.basic_price || ""} // Ensure the value is never undefined
+                    onChange={(e) => updateMaterial(index, "basic_price", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <button onClick={() => deleteRow(index)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
                     Delete
                   </button>
                 </td>
@@ -119,23 +178,7 @@ export default function Materials() {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex justify-center gap-4 mt-6">
-        <button
-          onClick={addMaterial}
-          className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-all"
-        >
-          Add Material
-        </button>
-        <button
-          onClick={saveData}
-          className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition-all"
-        >
-          Save Data
-        </button>
-      </div>
+      )}
     </div>
   );
 }

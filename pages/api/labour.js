@@ -1,38 +1,92 @@
-// /pages/api/labour.js
-
-let labourData = [
-  { description: 'Skilled Labour', unit: 'Day', price: '1000.00' },
-  { description: 'Unskilled Labour', unit: 'Day', price: '600.00' },
-  { description: 'Vibrator Operator', unit: 'Day', price: '1000.00' },
-  { description: 'Concrete Mixer Operator', unit: 'Day', price: '1000.00' },
-];
+import connectDB from "../../lib/mongodb";
+import LabourRate from "../../models/basic_pricelb"; // Correct model import
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      const updatedLabourData = req.body;
-      console.log('Received Labour Data:', updatedLabourData);
+  try {
+    // Establish DB connection
+    await connectDB();
 
-      // Here you can handle the data, for example, save it to a database.
-      // For simplicity, we're just logging it here, and you can update the in-memory data.
-      labourData = updatedLabourData; // Update the in-memory data (if needed)
+    switch (req.method) {
+      // ✅ GET: Fetch all labour data
+      case "GET":
+        try {
+          const items = await LabourRate.find({});
+          return res.status(200).json({ status: "success", data: items });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          return res.status(500).json({ message: "Error fetching data", error: error.message });
+        }
 
-      // Send a success response
-      res.status(200).json({ message: 'Data saved successfully' });
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ message: 'Error saving data' });
+      // ✅ POST: Insert or update multiple labour data records
+      case "POST":
+        try {
+          // Ensure the request body is an array
+          if (!Array.isArray(req.body) || req.body.length === 0) {
+            return res.status(400).json({ message: "Expected a non-empty array of labour data" });
+          }
+
+          // Clear existing data before inserting new data (if needed)
+          await LabourRate.deleteMany({});
+          const result = await LabourRate.insertMany(req.body);
+
+          return res.status(201).json({ message: "Labour rates updated successfully", result });
+        } catch (error) {
+          console.error("Error saving data:", error);
+          return res.status(500).json({ message: "Error saving data", error: error.message });
+        }
+
+      // ✅ PUT: Update an existing labour data record
+      case "PUT":
+        try {
+          const { id, description, unit, price } = req.body;
+
+          if (!id || !description || !unit || price == null) {
+            return res.status(400).json({ message: "Missing required fields: id, description, unit, and price" });
+          }
+
+          const updatedLabour = await LabourRate.findByIdAndUpdate(
+            id,
+            { description, unit, price },
+            { new: true } // Return the updated document
+          );
+
+          if (!updatedLabour) {
+            return res.status(404).json({ message: "Labour rate not found" });
+          }
+
+          return res.status(200).json({ message: "Labour rate updated", updatedLabour });
+        } catch (error) {
+          console.error("Error updating data:", error);
+          return res.status(500).json({ message: "Error updating data", error: error.message });
+        }
+
+      // ✅ DELETE: Delete a specific labour data record by ID
+      case "DELETE":
+        try {
+          const { id } = req.body;
+
+          if (!id) {
+            return res.status(400).json({ message: "Missing ID for deletion" });
+          }
+
+          const deletedLabour = await LabourRate.findByIdAndDelete(id);
+
+          if (!deletedLabour) {
+            return res.status(404).json({ message: "Labour rate not found" });
+          }
+
+          return res.status(200).json({ message: "Labour rate deleted successfully" });
+        } catch (error) {
+          console.error("Error deleting data:", error);
+          return res.status(500).json({ message: "Error deleting data", error: error.message });
+        }
+
+      default:
+        res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+        return res.status(405).json({ message: `Method ${req.method} not allowed` });
     }
-  } else if (req.method === 'GET') {
-    try {
-      // Send the current labour data as a response
-      res.status(200).json(labourData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      res.status(500).json({ message: 'Error fetching data' });
-    }
-  } else {
-    // Handle unsupported HTTP methods
-    res.status(405).json({ message: 'Method Not Allowed' });
+  } catch (error) {
+    console.error("Error in request handler:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 }

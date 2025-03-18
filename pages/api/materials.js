@@ -1,53 +1,88 @@
-let materialsData = [
-  { trade: 'CONCRETE', material: 'Cement', unit: 'gal', price: '' },
-  { trade: 'CONCRETE', material: 'Sand', unit: 'cube.', price: '' },
-  { trade: 'CONCRETE', material: 'Metal 3/4 "', unit: 'cube.', price: '' },
-  { trade: 'CONCRETE', material: 'Metal 1 "', unit: 'cube.', price: '' },
-  { trade: 'CONCRETE', material: 'Metal 2 "', unit: 'cube.', price: '' },
-  { trade: 'CONCRETE', material: 'Water', unit: 'gal.', price: '' },
-];
+import connectDB from "../../lib/mongodb";
+import MaterialRate from "../../models/basic_pricemt"; // Correct model import
 
 export default async function handler(req, res) {
-  // Handle GET request: Fetch saved materials
-  if (req.method === 'GET') {
-    try {
-      res.status(200).json(materialsData); // Send the stored materials
-    } catch (error) {
-      console.error('Error fetching materials data:', error);
-      res.status(500).json({ message: 'Error fetching materials data' });
-    }
-  }
+  await connectDB();
 
-  // Handle PUT request: Update the price of a material
-  else if (req.method === 'PUT') {
-    try {
-      const { index, price } = req.body; // Get the index and price from the request body
+  switch (req.method) {
+    case "GET":
+      try {
+        const items = await MaterialRate.find({});
+        return res.status(200).json({ status: "success", data: items });
+      } catch (error) {
+        console.error("GET Error:", error);
+        return res.status(500).json({ message: "Error fetching material data", error: error.message });
+      }
 
-      // Update the price for the material
-      materialsData[index].price = price;
+    case "POST":
+      try {
+        // Check if req.body is an array and is not empty
+        if (!Array.isArray(req.body) || req.body.length === 0) {
+          return res.status(400).json({ message: "Expected a non-empty array of material data" });
+        }
 
-      res.status(200).json({ message: 'Price updated successfully' });
-    } catch (error) {
-      console.error('Error updating materials data:', error);
-      res.status(500).json({ message: 'Error updating materials data' });
-    }
-  }
+        // Validate each item in the array (Trade, Material, unit, and basic_price)
+        for (let item of req.body) {
+          if (!item.Trade || !item.Material || !item.unit || item.basic_price == null) {
+            return res.status(400).json({ message: "Each material data must have Trade, Material, unit, and basic_price" });
+          }
+        }
 
-  // Handle POST request: Save the materials data (e.g., adding a new material)
-  else if (req.method === 'POST') {
-    try {
-      const newMaterials = req.body; // Get new materials from the request body
+        // Clear existing data and insert new data
+        await MaterialRate.deleteMany({});
+        await MaterialRate.insertMany(req.body);
 
-      // Save the new materials to in-memory storage
-      materialsData = newMaterials;
+        return res.status(201).json({ message: "Material data updated successfully" });
+      } catch (error) {
+        console.error("POST Error:", error);
+        return res.status(500).json({ message: "Error saving material data", error: error.message });
+      }
 
-      res.status(200).json({ message: 'Materials data saved successfully' });
-    } catch (error) {
-      console.error('Error saving materials data:', error);
-      res.status(500).json({ message: 'Error saving materials data' });
-    }
-  } else {
-    // Handle unsupported methods
-    res.status(405).json({ message: 'Method Not Allowed' });
+    case "PUT":
+      try {
+        const { id, Trade, Material, unit, basic_price } = req.body;
+
+        if (!id || !Trade || !Material || !unit || basic_price == null) {
+          return res.status(400).json({ message: "Missing required fields for material update" });
+        }
+
+        const updatedMaterial = await MaterialRate.findByIdAndUpdate(
+          id,
+          { Trade, Material, unit, basic_price },
+          { new: true }
+        );
+
+        if (!updatedMaterial) {
+          return res.status(404).json({ message: "Material data not found" });
+        }
+
+        return res.status(200).json({ message: "Material data updated successfully", updatedMaterial });
+      } catch (error) {
+        console.error("PUT Error:", error);
+        return res.status(500).json({ message: "Error updating material data", error: error.message });
+      }
+
+    case "DELETE":
+      try {
+        const { id } = req.query; // Get the id from query parameters
+
+        if (!id) {
+          return res.status(400).json({ message: "Missing ID for deletion" });
+        }
+
+        const deletedMaterial = await MaterialRate.findByIdAndDelete(id);
+        if (!deletedMaterial) {
+          return res.status(404).json({ message: "Material data not found" });
+        }
+
+        return res.status(200).json({ message: "Material data deleted successfully" });
+      } catch (error) {
+        console.error("DELETE Error:", error);
+        return res.status(500).json({ message: "Error deleting material data", error: error.message });
+      }
+
+    default:
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+      return res.status(405).json({ message: `Method ${req.method} not allowed` });
   }
 }
