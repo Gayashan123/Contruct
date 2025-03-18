@@ -1,177 +1,166 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export default function Labour() {
   const [labourData, setLabourData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Provided default data
-  const defaultLabourData = [
-    { Item_No: 1, description: 'Painter', Code_no: 'L-001', unit: 'Day', price: '2500.00' },
-    { Item_No: 2, description: 'Plumber', Code_no: 'L-002', unit: 'Day', price: '2500.00' },
-    { Item_No: 3, description: 'SK Labour', Code_no: 'L-003', unit: 'Day', price: '2000.00' },
-    { Item_No: 4, description: 'SK Labour (Vibrator)', Code_no: 'L-004', unit: 'Day', price: '2000.00' },
-    { Item_No: 5, description: 'Tinker', Code_no: 'L-005', unit: 'Day', price: '2500.00' },
-    { Item_No: 6, description: 'Tiler', Code_no: 'L-006', unit: 'Day', price: '2500.00' },
-    { Item_No: 7, description: 'U / SK Labourer', Code_no: 'L-007', unit: 'Day', price: '1800.00' },
-    { Item_No: 8, description: 'Carpenter', Code_no: 'L-008', unit: 'Day', price: '2500.00' },
-    { Item_No: 9, description: 'Mason', Code_no: 'L-009', unit: 'Day', price: '2500.00' },
-    { Item_No: 10, description: 'Glazier', Code_no: 'L-010', unit: 'Day', price: '1800.00' }
-  ];
+  useEffect(() => {
+    loadLabourData();
+  }, []);
 
-  // Fetch data from the API on component mount
   const loadLabourData = async () => {
     try {
-      const response = await fetch('/api/labour_rate', { method: 'GET' });
+      const response = await fetch("/api/labour_rate");
       const result = await response.json();
-
       if (response.ok) {
-        // Set the fetched data
         setLabourData(result);
       } else {
-        // If fetching fails, fallback to default data
-        setLabourData(defaultLabourData);
+        setLabourData([]);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setLabourData(defaultLabourData); // Fallback to default data in case of error
+      console.error("Error fetching data:", error);
+      setLabourData([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadLabourData();
-  }, []); // Run only once when the component mounts
-
   const addLabour = () => {
     const newItemNo = labourData.length + 1;
-    const newCodeNo = `L-${String(newItemNo).padStart(3, '0')}`;
-    const newLabour = { Item_No: newItemNo, description: '', Code_no: newCodeNo, unit: 'Day', price: '' };
+    const newCodeNo = `L-${String(newItemNo).padStart(3, "0")}`;
+    const newLabour = {
+      _id: "temp-" + newItemNo,
+      Item_No: newItemNo,
+      description: "",
+      Code_no: newCodeNo,
+      unit: "Day",
+      price: "",
+      isNew: true,
+    };
     setLabourData([...labourData, newLabour]);
+    setHasChanges(true);
   };
 
-  const updateLabour = (index, key, value) => {
-    const updatedLabour = [...labourData];
-    updatedLabour[index][key] = value;
-    setLabourData(updatedLabour);
-  };
-
-  const deleteRow = async (index) => {
-    const deletedLabour = labourData[index];
-    const updatedLabour = labourData.filter((_, i) => i !== index);
-    setLabourData(updatedLabour);
-
-    try {
-      const response = await fetch(`/api/labour_rate?id=${deletedLabour.Item_No}`, { method: 'DELETE' });
-      if (response.ok) {
-        alert('Item deleted successfully');
-      } else {
-        throw new Error('Failed to delete item on server');
-      }
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      alert('Error deleting item from server');
-      setLabourData([...labourData]); // Restore the state if server delete fails
-    }
+  const updateLabour = (id, key, value) => {
+    setLabourData((prev) =>
+      prev.map((labour) =>
+        labour._id === id ? { ...labour, [key]: value } : labour
+      )
+    );
+    setHasChanges(true);
   };
 
   const saveData = async () => {
-    const invalidData = labourData.some(labour => !labour.price || labour.price <= 0);
-    if (invalidData) {
-      alert('Please make sure all price fields are filled with valid values.');
+    if (labourData.some((labour) => !labour.description || !labour.Code_no || !labour.unit || !labour.price)) {
+      alert("Please fill all fields before saving.");
       return;
     }
 
     try {
-      const response = await fetch('/api/labour_rate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(labourData),
+      const formattedData = labourData.map(({ isNew, _id, ...rest }) => rest);
+      const response = await fetch("/api/labour_rate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
       });
 
       const result = await response.json();
       if (response.ok) {
-        alert('Data saved successfully!');
+        alert("Data saved successfully!");
+        loadLabourData();
+        setHasChanges(false);
       } else {
-        alert('Failed to save data: ' + result.message);
+        alert("Failed to save: " + result.message);
       }
     } catch (error) {
-      alert('Error occurred: ' + error.message);
-      console.error('Error:', error);
+      console.error("Save error:", error);
+      alert("Error saving data");
     }
   };
 
-  
+  const deleteRow = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this labour rate?");
+    if (!confirmDelete) return;
+    
+    if (!id.startsWith("temp-")) {
+      try {
+        const response = await fetch("/api/labour_rate", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Failed to delete");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("Error deleting labour rate");
+        return;
+      }
+    }
+    setLabourData((prev) => prev.filter((labour) => labour._id !== id));
+    setHasChanges(true);
+  };
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <div className="flex justify-center items-center py-12 text-white shadow-lg bg-gradient-to-r from-blue-800 via-gray-700 to-gray-600 rounded-lg">
-        <h1 className="text-4xl font-bold uppercase">Labour Table</h1>
-      </div>
+      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Labour Table</h1>
 
-      <div className="mt-8 overflow-x-auto">
-        <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
-          <thead className="bg-gray-700 text-white">
-            <tr>
-              <th className="p-3">Item No</th>
-              <th className="p-3">Code No</th>
-              <th className="p-3">Description</th>
-              <th className="p-3">Unit</th>
-              <th className="p-3">Price (Rs.)</th>
-              <th className="p-3">Actions</th>
+      <button onClick={addLabour} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+        Add Labour
+      </button>
+
+      {hasChanges && (
+        <button onClick={saveData} className="ml-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
+          Save Changes
+        </button>
+      )}
+
+      <table className="w-full mt-4 border bg-white shadow-md">
+        <thead className="bg-gray-700 text-white">
+          <tr>
+            <th className="p-3">Item No</th>
+            <th className="p-3">Code No</th>
+            <th className="p-3">Description</th>
+            <th className="p-3">Unit</th>
+            <th className="p-3">Price (Rs.)</th>
+            <th className="p-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {labourData.map((labour) => (
+            <tr key={labour._id} className="border-b text-center hover:bg-gray-200">
+              <td className="p-3">{labour.Item_No}</td>
+              <td className="p-3">{labour.Code_no}</td>
+              <td className="p-3">
+                <input
+                  type="text"
+                  value={labour.description}
+                  onChange={(e) => updateLabour(labour._id, "description", e.target.value)}
+                  className="border p-2 w-full"
+                />
+              </td>
+              <td className="p-3">{labour.unit}</td>
+              <td className="p-3">
+                <input
+                  type="number"
+                  value={labour.price}
+                  onChange={(e) => updateLabour(labour._id, "price", e.target.value)}
+                  className="border p-2 w-full"
+                />
+              </td>
+              <td className="p-3">
+                <button onClick={() => deleteRow(labour._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {labourData.map((labour, index) => (
-              <tr key={index} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">{labour.Item_No}</td>
-                <td className="p-3">{labour.Code_no}</td>
-                <td className="p-3">
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded"
-                    value={labour.description}
-                    onChange={(e) => updateLabour(index, 'description', e.target.value)}
-                  />
-                </td>
-                <td className="p-3">{labour.unit}</td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded"
-                    value={labour.price}
-                    onChange={(e) => updateLabour(index, 'price', e.target.value)}
-                  />
-                </td>
-                <td className="p-3">
-                  <button
-                    onClick={() => deleteRow(index)}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-center gap-4 mt-6">
-        <button
-          onClick={addLabour}
-          className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-all"
-        >
-          Add Labour
-        </button>
-        <button
-          onClick={saveData}
-          className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition-all"
-        >
-          Save Data
-        </button>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

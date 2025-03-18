@@ -1,5 +1,5 @@
-import connectDB from "../../lib/mongodb";
-import PlantRate from "../../models/plant_rate";
+import connectDB from "../../lib/mongodb";  // MongoDB connection
+import PlantRate from "../../models/plant_rate";  // PlantRate model
 
 // Default API handler function
 export default async function handler(req, res) {
@@ -17,45 +17,57 @@ export default async function handler(req, res) {
 
     case "POST":
       try {
-        // Extract body content for creating a new plant rate
-        const { Item_No, description, Code_no, unit, price } = req.body;
-
-        // Validate the required fields
-        if (!Item_No || !description || !Code_no || !unit || !price) {
-          return res.status(400).json({ message: "All fields are required" });
+        // Check if the request body is an array and not empty
+        if (!Array.isArray(req.body) || req.body.length === 0) {
+          return res.status(400).json({ message: "Expected a non-empty array of plant data" });
         }
 
-        // Create a new plant rate document
-        const newPlantRate = new PlantRate({
-          Item_No,
-          description,
-          Code_no,
-          unit,
-          price,
-        });
+        // Delete all existing plant rates and insert the new ones
+        await PlantRate.deleteMany({});
+        await PlantRate.insertMany(req.body);
 
-        // Save to the database
-        await newPlantRate.save();
-
-        return res.status(201).json({ message: "Plant rate added successfully", newPlantRate });
+        return res.status(201).json({ message: "Plant rates updated successfully" });
       } catch (error) {
-        console.error("Error adding plant rate:", error.message);
-        return res.status(500).json({ message: "Failed to add plant rate" });
+        return res.status(500).json({ message: "Error saving plant rates" });
+      }
+
+    case "PUT":
+      try {
+        const { id, Item_No, description, Code_no, unit, price } = req.body;
+        if (!id) {
+          return res.status(400).json({ message: "Missing plant rate ID" });
+        }
+
+        const updatedPlantRate = await PlantRate.findByIdAndUpdate(
+          id,
+          { Item_No, description, Code_no, unit, price },
+          { new: true }
+        );
+
+        if (!updatedPlantRate) {
+          return res.status(404).json({ message: "Plant rate not found" });
+        }
+
+        return res.status(200).json({ message: "Plant rate updated", updatedPlantRate });
+      } catch (error) {
+        return res.status(500).json({ message: "Error updating plant rate" });
       }
 
     case "DELETE":
       try {
         const { id } = req.body;
-        
-        // Delete plant rate by ID
-        await PlantRate.findByIdAndDelete(id);
+        if (!id) {
+          return res.status(400).json({ message: "Missing ID for deletion" });
+        }
 
+        await PlantRate.findByIdAndDelete(id);
         return res.status(200).json({ message: "Plant rate deleted successfully" });
       } catch (error) {
         return res.status(500).json({ message: "Error deleting plant rate" });
       }
 
     default:
-      return res.status(405).json({ message: "Method Not Allowed" });
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+      return res.status(405).json({ message: `Method ${req.method} not allowed` });
   }
 }

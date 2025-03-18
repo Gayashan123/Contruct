@@ -8,5 +8,4 @@ const LabourSchema = new mongoose.Schema({
   price: { type: Number, required: true, min: 0 },
 });
 
-// Prevent duplicate model registration
 export default mongoose.models.LabourData || mongoose.model("LabourData", LabourSchema);
