@@ -1,5 +1,5 @@
-import connectDB from "../../lib/mongodb";  // MongoDB connection
 import MaterialRate from "../../models/material_rate";  // MaterialRate model
+import connectDB from "../../lib/mongodb";  // MongoDB connection
 
 // Default API handler function
 export default async function handler(req, res) {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         const items = await MaterialRate.find({});
         return res.status(200).json(items);
       } catch (error) {
-        return res.status(500).json({ message: "Error fetching material rates" });
+        return res.status(500).json({ message: "Error fetching material rates", error: error.message });
       }
 
     case "POST":
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 
         return res.status(201).json({ message: "Material rates updated successfully" });
       } catch (error) {
-        return res.status(500).json({ message: "Error saving material rates" });
+        return res.status(500).json({ message: "Error saving material rates", error: error.message });
       }
 
     case "PUT":
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({ message: "Material rate updated", updatedMaterialRate });
       } catch (error) {
-        return res.status(500).json({ message: "Error updating material rate" });
+        return res.status(500).json({ message: "Error updating material rate", error: error.message });
       }
 
     case "DELETE":
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         await MaterialRate.findByIdAndDelete(id);
         return res.status(200).json({ message: "Material rate deleted successfully" });
       } catch (error) {
-        return res.status(500).json({ message: "Error deleting material rate" });
+        return res.status(500).json({ message: "Error deleting material rate", error: error.message });
       }
 
     default:

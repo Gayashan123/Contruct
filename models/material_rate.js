@@ -10,5 +10,5 @@ const MaterialRateSchema = new mongoose.Schema({
 });
 
 // Check if the model already exists and export it
-export default mongoose.models.MaterialRate ||
-  mongoose.model('MaterialRate', MaterialRateSchema);
+export default mongoose.models.Material_Rate ||
+  mongoose.model('Material_Rate', MaterialRateSchema);
