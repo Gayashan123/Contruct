@@ -1,152 +1,151 @@
-import React, { useState, useEffect } from 'react';
+"use client";
 
-export default function Plants() {
-  // State to hold the plant data
+import React, { useState, useEffect } from "react";
+
+export default function Plant() {
   const [plantData, setPlantData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Fetch plant data from the API when the component mounts
   useEffect(() => {
-    const fetchPlantData = async () => {
-      try {
-        const response = await fetch('/api/plants', {
-          method: 'GET',
-        });
-        const result = await response.json();
-        
-        if (response.ok) {
-          // Ensure description and basicPrice are always strings
-          const normalizedData = result.map((plant) => ({
-            description: plant.description || '',
-            basicPrice: plant.basicPrice || '',
-          }));
-          setPlantData(normalizedData);  // Set the plant data from the response
-        } else {
-          alert('Failed to fetch plant data: ' + result.message);
-        }
-      } catch (error) {
-        alert('Error fetching data: ' + error.message);
-        console.error('Error:', error);
-      }
-    };
-
-    fetchPlantData();
+    loadPlantData();
   }, []);
 
-  // Add a new plant
-  const addPlant = () => {
-    setPlantData([
-      ...plantData,
-      { description: '', basicPrice: '' },
-    ]);
-  };
-
-  // Update the plant's basic price
-  const updatePrice = (index, newPrice) => {
-    const updatedPlants = [...plantData];
-    updatedPlants[index].basicPrice = newPrice;
-    setPlantData(updatedPlants);
-  };
-
-  // Delete a plant
-  const deleteRow = (index) => {
-    const updatedPlants = plantData.filter((_, i) => i !== index);
-    setPlantData(updatedPlants);
-  };
-
-  // Save plant data to the API
-  const saveData = async () => {
+  const loadPlantData = async () => {
     try {
-      const response = await fetch('/api/plants', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(plantData),
-      });
-
+      const response = await fetch("/api/plant");
       const result = await response.json();
-
       if (response.ok) {
-        alert('Data saved successfully!');
-        console.log('Success:', result.message);
+        setPlantData(result.data);
       } else {
-        alert('Failed to save data: ' + result.message);
-        console.log('Error:', result.message);
+        setPlantData([]);
       }
     } catch (error) {
-      alert('Error occurred: ' + error.message);
-      console.error('Error:', error);
+      console.error("Error fetching data:", error);
+      setPlantData([]);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const addPlant = () => {
+    setPlantData([...plantData, { description: "", basic_price: "", isNew: true }]);
+    setHasChanges(true);
+  };
+
+  const updatePlant = (index, key, value) => {
+    setPlantData((prev) =>
+      prev.map((plant, i) => (i === index ? { ...plant, [key]: value } : plant))
+    );
+    setHasChanges(true);
+  };
+
+  const saveData = async () => {
+    if (plantData.some((plant) => !plant.description || plant.basic_price == null)) {
+      alert("Please fill all fields before saving.");
+      return;
+    }
+
+    try {
+      const formattedData = plantData.map(({ isNew, _id, ...rest }) => rest);
+      const response = await fetch("/api/plant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+      });
+
+      if (response.ok) {
+        alert("Data saved successfully!");
+        loadPlantData();
+        setHasChanges(false);
+      } else {
+        alert("Failed to save data");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Error saving data");
+    }
+  };
+
+  const deleteRow = async (index) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
+    if (!confirmDelete) return;
+
+    const id = plantData[index]._id;
+    if (!id.startsWith("temp-")) {
+      try {
+        const response = await fetch(`/api/plant?id=${id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Failed to delete");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("Error deleting entry");
+        return;
+      }
+    }
+
+    setPlantData((prev) => prev.filter((_, i) => i !== index));
+    setHasChanges(true);
   };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      {/* Hero Section */}
-      <div className="flex justify-center items-center py-12 text-white shadow-lg bg-gradient-to-r from-green-800 via-gray-700 to-gray-600 rounded-lg">
-        <h1 className="text-4xl font-bold uppercase">Plants Table</h1>
-      </div>
+      <div className="bg-white shadow-lg rounded-lg p-6">
+      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Materials Table</h1>
 
-      {/* Table */}
-      <div className="mt-8 overflow-x-auto">
-        <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
-          <thead className="bg-gray-700 text-white">
-            <tr>
-              <th className="p-3">Description</th>
-              <th className="p-3">Basic Price</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {plantData.map((plant, index) => (
-              <tr key={index} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded"
-                    value={plant.description}
-                    onChange={(e) => {
-                      const updatedPlants = [...plantData];
-                      updatedPlants[index].description = e.target.value;
-                      setPlantData(updatedPlants);
-                    }}
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded"
-                    value={plant.basicPrice}
-                    onChange={(e) => updatePrice(index, e.target.value)}
-                  />
-                </td>
-                <td className="p-3">
-                  <button
-                    onClick={() => deleteRow(index)}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="flex mb-4 space-x-4">
+          <button onClick={addPlant} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            Add Plant
+          </button>
+          {hasChanges && (
+            <button onClick={saveData} className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400">
+              Save Changes
+            </button>
+          )}
+        </div>
+
+        {isLoading ? (
+          <p className="text-center">Loading...</p>
+        ) : (
+          <table className="w-full table-auto bg-white shadow-md rounded-lg">
+            <thead className="bg-gray-700 text-white">
+              <tr>
+                <th className="py-2 px-4">Description</th>
+                <th className="py-2 px-4">Basic Price</th>
+                <th className="py-2 px-4">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex justify-center gap-4 mt-6">
-        <button
-          onClick={addPlant}
-          className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-all"
-        >
-          Add Plant
-        </button>
-        <button
-          onClick={saveData}
-          className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition-all"
-        >
-          Save Data
-        </button>
+            </thead>
+            <tbody>
+              {plantData.map((plant, index) => (
+                <tr key={index} className="border-t hover:bg-gray-100">
+                  <td className="py-2 px-4">
+                    <input
+                      type="text"
+                      value={plant.description}
+                      onChange={(e) => updatePlant(index, "description", e.target.value)}
+                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
+                    />
+                  </td>
+                  <td className="py-2 px-4">
+                    <input
+                      type="number"
+                      value={plant.basic_price}
+                      onChange={(e) => updatePlant(index, "basic_price", e.target.value)}
+                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
+                    />
+                  </td>
+                  <td className="py-2 px-4 text-center">
+                    <button
+                      onClick={() => deleteRow(index)}
+                      className="bg-red-600 text-white px-4 py-1 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -7,7 +7,6 @@ const materialRateSchema = new mongoose.Schema({
   basic_price: { type: Number, required: true },
 });
 
-// Ensure the model is mapped to the correct collection name
 const MaterialRate = mongoose.models.MaterialRate || mongoose.model("MaterialRate", materialRateSchema);
 
 export default MaterialRate;

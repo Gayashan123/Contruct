@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 
@@ -7,75 +7,59 @@ export default function Materials() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Fetch materials data from the API when the component mounts
   useEffect(() => {
     loadMaterialsData();
   }, []);
 
   const loadMaterialsData = async () => {
     try {
-      const response = await fetch("/api/materials"); // Fetch the materials data from backend
+      const response = await fetch("/api/materials");
       const result = await response.json();
       if (response.ok) {
-        setMaterialsData(result.data); // Populate state with fetched data
+        setMaterialsData(result.data);
       } else {
-        setMaterialsData([]); // Handle any errors by setting an empty array
+        setMaterialsData([]);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      setMaterialsData([]); // Handle errors in fetching
+      setMaterialsData([]);
     } finally {
-      setIsLoading(false); // Stop the loading indicator when data is ready
+      setIsLoading(false);
     }
   };
 
-  // Add a new material
   const addMaterial = () => {
-    const newMaterial = {
-      Trade: "", // Empty trade (should be filled)
-      Material: "", // Empty material name (should be filled)
-      unit: "", // Empty unit (should be filled)
-      basic_price: "", // Empty price (should be filled)
-      isNew: true,
-      _id: `temp-${Date.now()}`, // Temporary ID for new data
-    };
-    setMaterialsData([...materialsData, newMaterial]);
-    setHasChanges(true); // Track changes
+    setMaterialsData([...materialsData, { Trade: "", Material: "", unit: "", basic_price: "", isNew: true }]);
+    setHasChanges(true);
   };
 
-  // Update material data
   const updateMaterial = (index, key, value) => {
     setMaterialsData((prev) =>
-      prev.map((material, i) =>
-        i === index ? { ...material, [key]: value } : material
-      )
+      prev.map((material, i) => (i === index ? { ...material, [key]: value } : material))
     );
-    setHasChanges(true); // Track changes
+    setHasChanges(true);
   };
 
-  // Save materials data to the API
   const saveData = async () => {
-    // Ensure all required fields are filled
     if (materialsData.some((material) => !material.Trade || !material.Material || !material.unit || material.basic_price == null)) {
       alert("Please fill all fields before saving.");
       return;
     }
 
     try {
-      const formattedData = materialsData.map(({ isNew, _id, ...rest }) => rest); // Remove temp _id
+      const formattedData = materialsData.map(({ isNew, _id, ...rest }) => rest);
       const response = await fetch("/api/materials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formattedData), // Send updated data to the backend
+        body: JSON.stringify(formattedData),
       });
 
-      const result = await response.json();
       if (response.ok) {
         alert("Data saved successfully!");
-        loadMaterialsData(); // Reload the data after saving
+        loadMaterialsData();
         setHasChanges(false);
       } else {
-        alert("Failed to save: " + result.message);
+        alert("Failed to save data");
       }
     } catch (error) {
       console.error("Save error:", error);
@@ -83,7 +67,6 @@ export default function Materials() {
     }
   };
 
-  // Delete a material
   const deleteRow = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this material?");
     if (!confirmDelete) return;
@@ -91,19 +74,15 @@ export default function Materials() {
     const id = materialsData[index]._id;
     if (!id.startsWith("temp-")) {
       try {
-        const response = await fetch(`/api/materials?id=${id}`, {
-          method: "DELETE",
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Failed to delete");
+        const response = await fetch(`/api/materials?id=${id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Failed to delete");
       } catch (error) {
         console.error("Error deleting:", error);
         alert("Error deleting material");
         return;
       }
     }
-    setMaterialsData((prev) => prev.filter((_, i) => i !== index)); // Remove the row from the state
+    setMaterialsData((prev) => prev.filter((_, i) => i !== index));
     setHasChanges(true);
   };
 
@@ -137,43 +116,11 @@ export default function Materials() {
           <tbody>
             {materialsData.map((material, index) => (
               <tr key={material._id || `temp-${index}`} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">
-                  <input
-                    type="text"
-                    value={material.Trade || ""} // Ensure the value is never undefined
-                    onChange={(e) => updateMaterial(index, "Trade", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="text"
-                    value={material.Material || ""} // Ensure the value is never undefined
-                    onChange={(e) => updateMaterial(index, "Material", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="text"
-                    value={material.unit || ""} // Ensure the value is never undefined
-                    onChange={(e) => updateMaterial(index, "unit", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    value={material.basic_price || ""} // Ensure the value is never undefined
-                    onChange={(e) => updateMaterial(index, "basic_price", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <button onClick={() => deleteRow(index)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
-                    Delete
-                  </button>
-                </td>
+                <td className="p-3"><input type="text" value={material.Trade} onChange={(e) => updateMaterial(index, "Trade", e.target.value)} className="border p-2 w-full" /></td>
+                <td className="p-3"><input type="text" value={material.Material} onChange={(e) => updateMaterial(index, "Material", e.target.value)} className="border p-2 w-full" /></td>
+                <td className="p-3"><input type="text" value={material.unit} onChange={(e) => updateMaterial(index, "unit", e.target.value)} className="border p-2 w-full" /></td>
+                <td className="p-3"><input type="number" value={material.basic_price} onChange={(e) => updateMaterial(index, "basic_price", e.target.value)} className="border p-2 w-full" /></td>
+                <td className="p-3"><button onClick={() => deleteRow(index)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">Delete</button></td>
               </tr>
             ))}
           </tbody>
