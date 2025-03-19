@@ -10,61 +10,31 @@ export default function Navbar() {
     <div className="bg-gray-800 text-white p-4 shadow-lg">
       <div className="flex justify-between items-center">
         {/* Logo or brand name */}
-        <div className="text-xl font-bold hover:text-gray-300 cursor-pointer">
-          Your Brand
+        <div className="text-xl font-bold cursor-pointer">
+          
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
           <ul className="flex space-x-6">
-            <li className="hover:scale-105 transition-all duration-300">
+            <li>
               <Link href="/">
-                <span className="hover:text-gray-300 cursor-pointer">Home</span>
+                <span className="cursor-pointer">Home</span>
               </Link>
             </li>
-            <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/Basic-prices">
-                <span className="hover:text-gray-300 cursor-pointer">Basic Prices</span>
+            <li>
+              <Link href="/pages/basic-prices">
+                <span className="cursor-pointer">Basic Prices</span>
               </Link>
             </li>
-            <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/basic-rates">
-                <span className="hover:text-gray-300 cursor-pointer">Basic Rates</span>
+            <li>
+              <Link href="/pages/basic-rates">
+                <span className="cursor-pointer">Basic Rates</span>
               </Link>
             </li>
-            <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/activities">
-                <span className="hover:text-gray-300 cursor-pointer">Activities</span>
-              </Link>
-            </li>
-            <li className="relative group hover:scale-105 transition-all duration-300">
-              <span className="hover:text-gray-300 cursor-pointer">Categories</span>
-              <ul className="absolute hidden group-hover:block bg-gray-700 text-white py-2 rounded-lg shadow-md mt-1">
-                <li>
-                  <Link href="/category/materials">
-                    <span className="block px-4 py-2 hover:bg-gray-600 cursor-pointer">Materials</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/category/labour">
-                    <span className="block px-4 py-2 hover:bg-gray-600 cursor-pointer">Labour</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/category/plant">
-                    <span className="block px-4 py-2 hover:bg-gray-600 cursor-pointer">Plant</span>
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="hover:scale-105 transition-all duration-300">
-              <Link href="/search">
-                <span className="hover:text-gray-300 cursor-pointer">Search</span>
-              </Link>
-            </li>
-            <li className="hover:scale-105 transition-all duration-300">
-              <Link href=".\Basic-prices\page.js">
-                <span className="hover:text-gray-300 cursor-pointer">Contact</span>
+            <li>
+              <Link href="/pages/activities">
+                <span className="cursor-pointer">Activities</span>
               </Link>
             </li>
           </ul>
@@ -102,36 +72,27 @@ export default function Navbar() {
         } md:hidden mt-4 space-y-4 transition-all duration-300 ease-in-out`}
       >
         <ul className="flex flex-col space-y-4">
-          <li className="hover:scale-105 transition-all duration-300">
+          <li>
             <Link href="/" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Home</span>
+              <span className="cursor-pointer">Home</span>
             </Link>
           </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/basic-prices" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Basic Prices</span>
+          <li>
+            <Link href="/pages/basic-prices" onClick={() => setIsMenuOpen(false)}>
+              <span className="cursor-pointer">Basic Prices</span>
             </Link>
           </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/basic-rates" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Basic Rates</span>
+          <li>
+            <Link href="/pages/basic-rates" onClick={() => setIsMenuOpen(false)}>
+              <span className="cursor-pointer">Basic Rates</span>
             </Link>
           </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/activities" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Activities</span>
+          <li>
+            <Link href="/pages/activities" onClick={() => setIsMenuOpen(false)}>
+              <span className="cursor-pointer">Activities</span>
             </Link>
           </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/search" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Search</span>
-            </Link>
-          </li>
-          <li className="hover:scale-105 transition-all duration-300">
-            <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
-              <span className="hover:text-gray-300 cursor-pointer">Contact</span>
-            </Link>
-          </li>
+         
         </ul>
       </div>
     </div>

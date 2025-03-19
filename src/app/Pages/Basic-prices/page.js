@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
-      
+      <Navbar />
 
       {/* Header Section */}
       <div className="bg-gray-800 text-white py-8 text-center shadow-md">
