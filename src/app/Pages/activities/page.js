@@ -11,17 +11,17 @@ const sections = [
   { name: 'Anti Termite Treatment & DPC', link:  '/pages/act/Anti-termite'},
   { name: 'Random Rubble Masonry Work', link: '/pages/act/Random_rubble' },
   { name: 'Concrete Work', link: '/pages/act/earth-work' },
-  { name: 'Formwork', link:'/pages/act/earth-work' },
+  { name: 'Formwork', link:'/pages/act/Formwork' },
   { name: 'Reinforcement', link: '/pages/act/earth-work' },
   { name: 'Block Work', link: '/pages/act/Block-work' },
   { name: 'Brick Work', link: '/pages/act/Brick-work' },
-  { name: 'Roof', link: '/pages/act/earth-work' },
+  { name: 'Roof', link: '/pages/act/Roof_covering' },
   { name: 'Doors and Windows', link: '/pages/act/earth-work' },
-  { name: 'Plumbing & Drainage', link: '/pages/act/earth-work' },
+  { name: 'Plumbing & Drainage', link: '/pages/act/PlumbingandDra' },
   { name: 'Plastering', link: '/pages/act/earth-work' },
-  { name: 'Tiling', link: '/pages/act/earth-work' },
-  { name: 'Ceiling', link: '/pages/act/earth-work' },
-  { name: 'Painting', link: '/pages/act/earth-work' },
+  { name: 'Tiling', link: '/pages/act/Tiling' },
+  { name: 'Ceiling', link: '/pages/act/Ceiling' },
+  { name: 'Painting', link: '/pages/act/Painting' },
 ];
 
 export default function Page() {
