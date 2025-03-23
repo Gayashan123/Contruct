@@ -49,7 +49,7 @@ export default function Page() {
 
         {activeTab === 'earth_work_support' && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Earth Work Support</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Anti_termite Treatment</h2>
             <Anti />
           </div>
         )}

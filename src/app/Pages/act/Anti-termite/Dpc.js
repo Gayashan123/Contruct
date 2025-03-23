@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const TableComponent = ({ title, data, totalAmount, rates }) => {
   return (
@@ -27,8 +27,8 @@ const TableComponent = ({ title, data, totalAmount, rates }) => {
                 <td className="p-2 border text-left">{row.description}</td>
                 <td className="p-2 border">{row.ref || '-'}</td>
                 <td className="p-2 border">{row.unit || '-'}</td>
-                <td className="p-2 border">{row.quantity !== undefined ? row.quantity : '-'}</td>
-                <td className="p-2 border">{row.rate !== undefined ? row.rate : '-'}</td>
+                <td className="p-2 border">{row.quantity ?? '-'}</td>
+                <td className="p-2 border">{row.rate ?? '-'}</td>
                 <td className="p-2 border font-semibold">{row.amount}</td>
               </tr>
             ))}
@@ -36,13 +36,10 @@ const TableComponent = ({ title, data, totalAmount, rates }) => {
               <td colSpan={6} className="p-2 border">Total For 1 Sqr</td>
               <td className="p-2 border">{totalAmount}</td>
             </tr>
-
             <tr className="font-bold text-center bg-gray-300">
               <td colSpan={6} className="p-2 border">Rate For 1 Sqr</td>
               <td className="p-2 border">{totalAmount}</td>
             </tr>
-
-
           </tbody>
         </table>
 
@@ -66,23 +63,77 @@ const TableComponent = ({ title, data, totalAmount, rates }) => {
 };
 
 export default function LabourAnalysis() {
-  const tableData = [
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+        const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+
+        if (materialResponse.ok && labourResponse.ok) {
+          const materialData = await materialResponse.json();
+          const labourData = await labourResponse.json();
+
+          const updatedData = exampleData.map(item => {
+            let total = 0;
+
+            const updatedRows = item.data.map(row => {
+              const rate = getRate(row.ref, labourData, materialData);
+              const amount = row.quantity * rate;
+              total += amount;
+              return { ...row, rate, amount };
+            });
+
+            return {
+              ...item,
+              data: updatedRows,
+              totalAmount: total,
+              rates: [
+                { type: '1 Sqr', amount: total },
+                { type: '1 ft²', amount: total / 100 },
+                { type: '1 m²', amount: total / 929.03 },
+              ],
+            };
+          });
+
+          setTableData(updatedData);
+        }
+      } catch (error) {
+        console.error('Error fetching rates:', error);
+      }
+    };
+
+    fetchRates();
+  }, []);
+
+  const getRate = (ref, labourData, materialData) => {
+    if (ref.startsWith('L')) {
+      return labourData.find(item => item.Code_no === ref)?.price || 0;
+    }
+    if (ref.startsWith('M')) {
+      return materialData.find(item => item.Code_no === ref)?.price || 0;
+    }
+    return 0;
+  };
+
+  const exampleData = [
     {
       title: "03.B.01 3/4\" thick DPC in cement sand 1:2 finished with 2 coats hot tar and blinded with sand",
       data: [
-        { no: '1', description: 'Cement', ref: 'M-026', unit: 'Bag', quantity: 2.25, rate: 980.00, amount: 2205.00 },
-        { no: '1.01', description: 'Sand', ref: 'M-113', unit: 'Cube', quantity: 0.11, rate: 20000.00, amount: 2200.00 },
-        { no: '1.02', description: 'Bitumen', ref: 'M-006', unit: 'Gal', quantity: 1.5, rate: 80.00, amount: 120.00 },
-        { no: '1.03', description: 'Fire Wood', ref: 'M-046', unit: 'Lbs', quantity: 10, rate: 250.00, amount: 2500.00 },
-        { no: '1.04', description: 'Water', ref: 'M-157', unit: 'Gal', quantity: 10, rate: 0.30, amount: 3.00 },
-        { no: '1.05', description: 'Mason', ref: 'L-009', unit: 'Day', quantity: 1.25, rate: 2500.00, amount: 3125.00 },
-        { no: '1.06', description: 'U / SK Labourer', ref: 'L-007', unit: 'Day', quantity: 2.5, rate: 1800.00, amount: 4500.00 },
+        { no: '1', description: 'Cement', ref: 'M-026', unit: 'Bag', quantity: 2.25 },
+        { no: '1.01', description: 'Sand', ref: 'M-113', unit: 'Cube', quantity: 0.11 },
+        { no: '1.02', description: 'Bitumen', ref: 'M-006', unit: 'Gal', quantity: 1.5 },
+        { no: '1.03', description: 'Fire Wood', ref: 'M-046', unit: 'Lbs', quantity: 10 },
+        { no: '1.04', description: 'Water', ref: 'M-157', unit: 'Gal', quantity: 10 },
+        { no: '1.05', description: 'Mason', ref: 'L-009', unit: 'Day', quantity: 1.25 },
+        { no: '1.06', description: 'U / SK Labourer', ref: 'L-007', unit: 'Day', quantity: 2.5 },
       ],
-      totalAmount: 14653.00,
+      totalAmount: 0,
       rates: [
-        { type: '1 Sqr', amount: 14653.00 },
-        { type: '1 ft²', amount: 146.53 },
-        { type: '1 m²', amount: 1576.66 },
+        { type: '1 Sqr', amount: 0 },
+        { type: '1 ft²', amount: 0 },
+        { type: '1 m²', amount: 0 },
       ],
     },
   ];
