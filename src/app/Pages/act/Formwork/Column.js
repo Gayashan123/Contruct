@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
@@ -78,19 +78,21 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
 
 
 export default function LabourAnalysis() {
-  const tableData = [
+const [tableData, setTableData] = useState([]);
+  
+    const exampleData = [
     {
-      title: "Sawn timber formwork for concrete beams in ground floor",
+      title: "Sawn timber formwork for concrete beams in ground floor (Analyse for 0.55 Sq )",
       data: [
-        { no: 1, description: "Sawn timber formwork for 9\" x 12\" concrete beams in ground floor - Making the mould", ref: "06.B.02", unit: "1 Use", quantity: 1, rate: 3645.00, amount: 3645.00 },
-        { no: 2, description: "Sawn timber formwork for concrete beams in ground floor-Assembling", ref: "06.B.03", unit: "1 Use", quantity: 1, rate: 1568.00, amount: 1568.00 },
-        { no: 3, description: "Allow 10% of Items (1.02) for Repairs", ref: "-", unit: "-", quantity: "-", rate: "-", amount: 156.80 },
-        { no: 4, description: "Carpenter - Assembling", ref: "L-008", unit: "Day", quantity: 1, rate: 2500.00, amount: 2500.00 },
-        { no: 5, description: "U / SK Labourer - Assembling", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 },
-        { no: 6, description: "Mould Oil", ref: "M-071", unit: "litre", quantity: 0.5, rate: 35.00, amount: 17.50 },
-        { no: 7, description: "Wire Nails", ref: "M-161", unit: "Lbs", quantity: 0.5, rate: 65.00, amount: 32.50 },
-        { no: 8, description: "Carpenter - dismantling, cleaning & repairing", ref: "L-008", unit: "Day", quantity: 0.5, rate: 2500.00, amount: 1250.00 },
-        { no: 9, description: "U / SK Labourer - dismantling, cleaning & repairing", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 }
+        { no:1.01, description: "Sawn timber formwork for 9\" x 12\" concrete beams in ground floor - Making the mould", ref: "M-172", unit: "1 Use", quantity: 1, rate: 3645.00, amount: 3645.00 },
+        { no: 1.02, description: "Sawn timber formwork for concrete beams in ground floor-Assembling", ref: "M-171", unit: "1 Use", quantity: 1, rate: 1568.00, amount: 1568.00 },
+        { no: 1.03, description: "Allow 10% of Items (1.02) for Repairs", ref: "-", unit: "-", quantity: 0, rate: 0, amount: 156.80 },
+        { no: 1.04, description: "Carpenter - Assembling", ref: "L-008", unit: "Day", quantity: 1, rate: 2500.00, amount: 2500.00 },
+        { no: 1.05, description: "U / SK Labourer - Assembling", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 },
+        { no: 1.06, description: "Mould Oil", ref: "M-071", unit: "litre", quantity: 0.5, rate: 35.00, amount: 17.50 },
+        { no: 1.07, description: "Wire Nails", ref: "M-161", unit: "Lbs", quantity: 0.5, rate: 65.00, amount: 32.50 },
+        { no: 1.08, description: "Carpenter - dismantling, cleaning & repairing", ref: "L-008", unit: "Day", quantity: 0.5, rate: 2500.00, amount: 1250.00 },
+        { no: 1.09, description: "U / SK Labourer - dismantling, cleaning & repairing", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 }
       ],
       totalAmount: 16369.80,
       rates: [
@@ -106,15 +108,15 @@ export default function LabourAnalysis() {
       ]
     },
     {
-      title: "Sawn timber formwork for 9\" x 12\" concrete beams in ground floor - Making the mould",
+      title: "Sawn timber formwork for 9\" x 12\" concrete beams in ground floor - Making the mould (Analyse for 4 Uses )",
       data: [
-        { no: 1, description: "1\" Thick Class II Timber", ref: "M-141", unit: "Sq.ft", quantity: 60, rate: 65.00, amount: 3900.00 },
-        { no: 2, description: "2\" x 1\" Class II Timber Battens", ref: "M-142", unit: "L.ft", quantity: 24, rate: 12.00, amount: 288.00 },
-        { no: 3, description: "2\" x 2\" Class II Timber In Yokes", ref: "M-143", unit: "L.ft", quantity: 45, rate: 22.00, amount: 990.00 },
-        { no: 4, description: "4\"X2\" Timber bearers", ref: "M-144", unit: "L.ft", quantity: 30, rate: 65.00, amount: 1950.00 },
-        { no: 5, description: "Wire Nails", ref: "M-161", unit: "Lbs", quantity: 2, rate: 50.00, amount: 100.00 },
-        { no: 6, description: "Carpenter", ref: "L-008", unit: "Day", quantity: 1.5, rate: 2500.00, amount: 3750.00 },
-        { no: 7, description: "U / SK Labourer", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 }
+        { no: 1.01, description: "1\" Thick Class II Timber", ref: "M-141", unit: "Sq.ft", quantity: 60, rate: 65.00, amount: 3900.00 },
+        { no: 1.02, description: "2\" x 1\" Class II Timber Battens", ref: "M-142", unit: "L.ft", quantity: 24, rate: 12.00, amount: 288.00 },
+        { no: 1.03, description: "2\" x 2\" Class II Timber In Yokes", ref: "M-143", unit: "L.ft", quantity: 45, rate: 22.00, amount: 990.00 },
+        { no: 1.04, description: "4\"X2\" Timber bearers", ref: "M-144", unit: "L.ft", quantity: 30, rate: 65.00, amount: 1950.00 },
+        { no: 1.05, description: "Wire Nails", ref: "M-161", unit: "Lbs", quantity: 2, rate: 50.00, amount: 100.00 },
+        { no: 1.06, description: "Carpenter", ref: "L-008", unit: "Day", quantity: 1.5, rate: 2500.00, amount: 3750.00 },
+        { no: 1.07, description: "U / SK Labourer", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 }
       ],
       totalAmount: 14578.00,
       rates: [
@@ -122,12 +124,12 @@ export default function LabourAnalysis() {
       ]
     },
     {
-      title: "Sawn timber formwork for concrete beams in ground floor-Assembling - Materials",
+      title: "Sawn timber formwork for concrete beams in ground floor-Assembling - Materials ((Analyse for 6 Uses )",
       data: [
-        { no: 1, description: "Timber props 4\" x 2\"", ref: "M-144", unit: "L.ft", quantity: 110, rate: 65.00, amount: 7150.00 },
-        { no: 2, description: "2\" x 2\" Class II Timber for bracings", ref: "M-143", unit: "L.ft", quantity: 80, rate: 22.00, amount: 1760.00 },
-        { no: 3, description: "1\" Thick Class II Timber base plate", ref: "M-141", unit: "Sq.ft", quantity: 6, rate: 65.00, amount: 390.00 },
-        { no: 4, description: "Timber Wedges", ref: "M-151", unit: "No", quantity: 22, rate: 5.00, amount: 110.00 }
+        { no: 1.01, description: "Timber props 4\" x 2\"", ref: "M-144", unit: "L.ft", quantity: 110, rate: 65.00, amount: 7150.00 },
+        { no: 1.02, description: "2\" x 2\" Class II Timber for bracings", ref: "M-143", unit: "L.ft", quantity: 80, rate: 22.00, amount: 1760.00 },
+        { no: 1.03, description: "1\" Thick Class II Timber base plate", ref: "M-141", unit: "Sq.ft", quantity: 6, rate: 65.00, amount: 390.00 },
+        { no: 1.04, description: "Timber Wedges", ref: "M-151", unit: "No", quantity: 22, rate: 5.00, amount: 110.00 }
       ],
       totalAmount: 9410.00,
       rates: [
@@ -136,11 +138,89 @@ export default function LabourAnalysis() {
     }
   ];
 
-  return (
-    <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">
-      {tableData.map((table, index) => (
-        <TableComponent key={index} {...table} />
-      ))}
-    </div>
-  );
-}
+  useEffect(() => {
+       const fetchRates = async () => {
+         try {
+           const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+           const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+       
+           if (materialResponse.ok && labourResponse.ok) {
+             const materialData = await materialResponse.json();
+             const labourData = await labourResponse.json();
+       
+             const updatedData = exampleData.map(item => {
+               let total = 0;
+       
+               // Iterate over each row in the data to calculate values
+               const updatedRows = item.data.map((row, index) => {
+                 let rate = getRate(row.ref, labourData, materialData);
+                 let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+       
+                 // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+                 if (row.description === "Allow 20% of Items ( 1.01 ) for Repairs") {
+                   const mainItemAmount = item.data[0]?.amount || 0; // Get the amount of the first item (1.01)
+                   row.amount = mainItemAmount * 20 / 100; // Apply 5% wastage
+                   amount = row.amount; // Update amount to the calculated wastage
+                 }
+       
+                 // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+                 if (row.description === "Allow 10% of Items (1.02) for Repairs") {
+                   const masonAmount = item.data[1]?.amount || 0; // Get the amount for Mason (1.06)
+                   
+                   row.amount = masonAmount  * 10 / 100; // Apply 5% wastage on mason and labourer
+                   amount = row.amount; // Update amount to the calculated scaffolding wastage
+                 }
+       
+                 total += amount;
+       
+                 return { ...row, rate, amount };
+               });
+       
+               return {
+                 ...item,
+                 data: updatedRows,
+                 totalAmount: total,
+                 rates: [
+                   { type: '1 Sq', amount: total },
+                   { type: '1 ft²', amount: total / 100 },
+                   { type: '1 m²', amount: total / 929.03 },
+                 ],
+                 floorRates: [
+                   { floor: "Ground Floor", rate: total / 929.03 },
+                   { floor: "First Floor", rate: 1481.75 },
+                   { floor: "Second Floor", rate: 1481.75 },
+                   { floor: "Third Floor", rate: 1481.75 },
+                 ],
+               };
+             });
+       
+             setTableData(updatedData);
+           }
+         } catch (error) {
+           console.error('Error fetching rates:', error);
+         }
+       };
+       
+        
+          fetchRates();
+        }, []);
+        
+        const getRate = (ref, labourData, materialData) => {
+          if (!ref) return 0;
+          if (ref.startsWith('L')) {
+            return labourData.find(item => item.Code_no === ref)?.price || 0;
+          }
+          if (ref.startsWith('M')) {
+            return materialData.find(item => item.Code_no === ref)?.price || 0;
+          }
+          return 0;
+        };
+      
+        return (
+          <div className="space-y-6">
+            {tableData.map((item, index) => (
+              <TableComponent key={index} {...item} />
+            ))}
+          </div>
+        );
+      }

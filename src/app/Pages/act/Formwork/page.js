@@ -48,7 +48,7 @@ export default function Page() {
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
         >
-          Beam
+          Column
         </button>
 
         <button
@@ -59,7 +59,7 @@ export default function Page() {
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
         >
-          Column
+          Beam
         </button>
       </div>
 
