@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
@@ -43,7 +43,7 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
         <div className="mt-4">
           <table className="w-full border-collapse text-sm">
             <tbody>
-              {rates && rates.map((rate, index) => (
+              {rates.map((rate, index) => (
                 <tr key={index} className="bg-yellow-200 text-center font-semibold border-b">
                   <td className="p-2 border">Rate (Say)</td>
                   <td className="p-2 border">{rate.type}</td>
@@ -76,10 +76,15 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   );
 };
 
+
+
 export default function LabourAnalysis() {
-  const tableData = [
+
+  const [tableData, setTableData] = useState([]);
+        
+          const exampleData = [
     {
-      title: "Preparing and apply one coat of Alkali resistant primer and two coats of emulsion paint to walls.",
+      title: "Preparing and apply one coat of Alkali resistant primer and two coats of emulsion paint to walls.(Analyse for 1 Sqr)",
       data: [
         { no: '1.0', description: 'Primer', ref: 'M-075', unit: 'litre', quantity: 0.9, rate: 329, amount: 296.10 },
         { no: '1.01', description: 'Emulsion Paint', ref: 'M-043', unit: 'litre', quantity: 1.4, rate: 647, amount: 905.80 },
@@ -97,7 +102,7 @@ export default function LabourAnalysis() {
       ],
     },
     {
-      title: "Painting walls with emulsion paint (2 Coats)",
+      title: "Painting walls with emulsion paint (2 Coats) (Analyse for 1 Sqr)",
       data: [
         { no: '1.0', description: 'Emulsion Paint - first coat', ref: 'M-043', unit: 'litre', quantity: 0.757, rate: 280.00, amount: 211.96 },
         { no: '1.01', description: 'Emulsion Paint - Second coat', ref: 'M-043', unit: "litre", quantity: 0.649, rate: 280.00, amount: 181.72 },
@@ -121,11 +126,90 @@ export default function LabourAnalysis() {
     // Other table data as is...
   ];
 
-  return (
-    <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">
-      {tableData.map((table, index) => (
-        <TableComponent key={index} {...table} />
-      ))}
-    </div>
-  );
-}
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+        const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+    
+        if (materialResponse.ok && labourResponse.ok) {
+          const materialData = await materialResponse.json();
+          const labourData = await labourResponse.json();
+    
+          const updatedData = exampleData.map(item => {
+            let total = 0;
+    
+            // Iterate over each row in the data to calculate values
+            const updatedRows = item.data.map((row, index) => {
+              let rate = getRate(row.ref, labourData, materialData);
+              let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+    
+              // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+              if (row.description === "Allow 3% Items (1.06) for Scaffolding") {
+                const mainItemAmount = item.data[5]?.amount || 0; // Get the amount of the first item (1.01)
+                row.amount = mainItemAmount * 3 / 100; // Apply 5% wastage
+                amount = row.amount; // Update amount to the calculated wastage
+              }
+    
+              // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+              if (row.description === "Allow 3% of Items (1.05, 1.06 ) for Scaffolding") {
+                const masonAmount = item.data[4]?.amount || 0; // Get the amount for Mason (1.06)
+                const masonAmount1 = item.data[5]?.amount || 0; // Get the amount for Mason (1.06)
+                
+                row.amount = (masonAmount +masonAmount1) * 3 / 100; // Apply 5% wastage on mason and labourer
+                amount = row.amount; // Update amount to the calculated scaffolding wastage
+              }
+    
+              total += amount;
+    
+              return { ...row, rate, amount };
+            });
+    
+            return {
+              ...item,
+              data: updatedRows,
+              totalAmount: total,
+              rates: [
+                { type: '1 Sq', amount: total },
+                { type: '1 ft²', amount: total / 100 },
+                { type: '1 m²', amount: total / 929.03 },
+              ],
+              floorRates: [
+                { floor: "Ground Floor", rate: total / 929.03 },
+                { floor: "First Floor", rate: 1481.75 },
+                { floor: "Second Floor", rate: 1481.75 },
+                { floor: "Third Floor", rate: 1481.75 },
+              ],
+            };
+          });
+    
+          setTableData(updatedData);
+        }
+      } catch (error) {
+        console.error('Error fetching rates:', error);
+      }
+    };
+    
+     
+       fetchRates();
+     }, []);
+     
+     const getRate = (ref, labourData, materialData) => {
+       if (!ref) return 0;
+       if (ref.startsWith('L')) {
+         return labourData.find(item => item.Code_no === ref)?.price || 0;
+       }
+       if (ref.startsWith('M')) {
+         return materialData.find(item => item.Code_no === ref)?.price || 0;
+       }
+       return 0;
+     };
+   
+     return (
+       <div className="space-y-6">
+         {tableData.map((item, index) => (
+           <TableComponent key={index} {...item} />
+         ))}
+       </div>
+     );
+   }
