@@ -38,7 +38,7 @@ const TableComponent = ({ title, data, totalAmount, rates, floorRates }) => {
             </tr>
 
             <tr className="font-bold text-center bg-gray-300">
-              <td colSpan={7} className="p-2 border">Analysis For 1 SQR</td>
+              <td colSpan={7} className="p-2 border">Analysis For 1.95 SQR</td>
               
             </tr>
 
