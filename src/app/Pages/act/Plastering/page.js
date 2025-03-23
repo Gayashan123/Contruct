@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import Footer from "../../../components/footer";
 import Navbar from "../../../components/navbar";
-import Link from "next/link";
-import Wood from "./Wood";
-import Wall from "./Wall";
-import Steel from "./Steel";
-import Soffit from "./Soffit";
+import Rendering from "./Rendering";
+import Skirting from "./Skirting";
+import SoffitPlastering from "./Sofit_plastering";
+import WallPlastering from "./Wall_plastering";
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState("Wall"); // Default to Site Preparation
+  const [activeTab, setActiveTab] = useState("Skirting");
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -28,83 +27,77 @@ export default function Page() {
       {/* Tab Navigation Section */}
       <div className="flex justify-center space-x-6 mb-6">
         <button
-          onClick={() => handleTabClick("Wall")}
+          onClick={() => handleTabClick("Skirting")}
           className={`py-2 px-6 text-lg font-semibold ${
-            activeTab === "Wall"
+            activeTab === "Skirting"
               ? "bg-blue-600 text-white"
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
         >
-          Wall
+          Skirting
         </button>
 
         <button
-          onClick={() => handleTabClick("Steel")}
+          onClick={() => handleTabClick("Rendering")}
           className={`py-2 px-6 text-lg font-semibold ${
-            activeTab === "Steel"
+            activeTab === "Rendering"
               ? "bg-blue-600 text-white"
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
         >
-          Steel
+          Rendering
         </button>
 
         <button
-          onClick={() => handleTabClick("Wood")}
+          onClick={() => handleTabClick("SoffitPlastering")}
           className={`py-2 px-6 text-lg font-semibold ${
-            activeTab === "Wood"
+            activeTab === "SoffitPlastering"
               ? "bg-blue-600 text-white"
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
-        >Wood</button>
+        >
+          Soffit Plastering
+        </button>
 
-
-<button
-          onClick={() => handleTabClick("Soffit")}
+        <button
+          onClick={() => handleTabClick("WallPlastering")}
           className={`py-2 px-6 text-lg font-semibold ${
-            activeTab === "Soffit"
+            activeTab === "WallPlastering"
               ? "bg-blue-600 text-white"
               : "bg-gray-200 text-gray-800"
           } rounded-lg hover:bg-blue-500 transition-all`}
-        >Soffit</button>
-
-
-
-
-
-
-
-
-
+        >
+          Wall Plastering
+        </button>
       </div>
 
       {/* Content Section */}
       <div className="px-6">
-        {activeTab === "Wall" && (
+        {activeTab === "Skirting" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Wall</h2>
-            <Wall />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Skirting</h2>
+            <Skirting />
           </div>
         )}
 
-        {activeTab === "Steel" && (
+        {activeTab === "Rendering" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Steel</h2>
-            <Steel />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Rendering</h2>
+            <Rendering />
           </div>
         )}
 
-        {activeTab === "Wood" && (
+        {activeTab === "SoffitPlastering" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Wood</h2>
-            <Wood />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Soffit Plastering</h2>
+            <SoffitPlastering />
           </div>
         )}
 
-        {activeTab === "Soffit" && (
+        {activeTab === "WallPlastering" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Soffit</h2>
-            <Soffit />
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Wall Plastering</h2>
+            <WallPlastering />
           </div>
         )}
       </div>

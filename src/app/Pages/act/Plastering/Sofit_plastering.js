@@ -54,7 +54,7 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           </table>
         </div>
 
-        {/* Floors Section (Only for the second table) */}
+        {/* Floors Section */}
         {floors && floors.length > 0 && (
           <div className="mt-4">
             <h3 className="text-md font-semibold text-gray-800 mb-2 text-center border-b pb-2">Floors Analysis</h3>
@@ -76,39 +76,57 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   );
 };
 
-
 export default function LabourAnalysis() {
   const tableData = [
     {
-      title: "Preparing and applying one coat of alkali-resistant primer and two coats of emulsion paint to the soffit of slabs",
+      title: "3/8\" thick plastering to Soffit Slab in Cement and sand 1:3 including floating with Lime putty",
       data: [
-        { "no": "1.00", "description": "Primer", "ref": "M-075", "unit": "litre", "quantity": 0.9, "rate": null, "amount": null },
-        { "no": "1.01", "description": "Emulsion Paint", "ref": "M-043", "unit": "litre", "quantity": 1.5, "rate": null, "amount": null },
-        { "no": "1.02", "description": "Water", "ref": "M-157", "unit": "Gal", "quantity": 0.1, "rate": null, "amount": null },
-        { "no": "1.03", "description": "6\" Brush", "ref": "M-021", "unit": "No", "quantity": 0.1, "rate": null, "amount": null },
-        { "no": "1.04", "description": "Painter", "ref": "L-001", "unit": "Day", "quantity": 1.75, "rate": 800.00, "amount": 1400.00 },
-        { "no": "1.05", "description": "Allow 3% of Items (1.05) for Scaffolding", "ref": "-", "unit": "-", "quantity": null, "rate": null, "amount": 42.00 }
+        { no: 1, description: "Cement", ref: "M-026", unit: "Bag", quantity: 0.8, rate: 980.00, amount: 784.00 },
+        { no: 2, description: "Slaked Lime", ref: "M-115", unit: "kg", quantity: 8, rate: 275.00, amount: 2200.00 },
+        { no: 3, description: "Sand", ref: "M-113", unit: "Cu", quantity: 0.05, rate: 20000.00, amount: 1000.00 },
+        { no: 4, description: "Water", ref: "M-157", unit: "Gal", quantity: 5, rate: 0.30, amount: 1.50 },
+        { no: 5, description: "Mason", ref: "L-009", unit: "Day", quantity: 2.5, rate: 2500.00, amount: 6250.00 },
+        { no: 6, description: "U / SK Labourer", ref: "L-007", unit: "Day", quantity: 2.5, rate: 1800.00, amount: 4500.00 },
+        { no: 7, description: "Scaffolding", ref: "", unit: "", quantity: null, rate: null, amount: 322.50 },
       ],
-      totalAmount: 1442.00,
+      totalAmount: 14274.00,
       rates: [
-        { type: "1 Sq", amount: 1442.00 },
-        { type: "1 ft²", amount: 14.42 },
-        { type: "1 m²", amount: 155.16 }
+        { type: "1Sq", amount: 14274.00 },
+        { type: "1ft2", amount: 142.74 },
+        { type: "1m2", amount: 1535.88 },
       ],
       floors: [
-        {flo:"Ground Floor",rate: "1 m²",amount: 155.16},
-        {flo:"First Floor",rate: "1 m²",amount: 170.68},
-        {flo:"Second Floor",rate: "1 m²",amount: 187.74},
-        {flo:"Third Floor",rate: "1 m²",amount: 206.52},
-      ]
-    }
+        { flo: "Ground floor", rate: "1m2", amount: 1535.88 },
+        { flo: "First Floor", rate: "1m2", amount: 1689.47 },
+        { flo: "Second Floor", rate: "1m2", amount: 1858.42 },
+        { flo: "Third Floor", rate: "1m2", amount: 2044.26 },
+      ],
+    },
+    {
+      title: "3/8\" thick plastering to sides and soffit of beams in Cement and sand 1:3 including floating with Lime putty",
+      data: [
+        { no: 1, description: "Cement", ref: "M-026", unit: "Bag", quantity: 0.8, rate: 980.00, amount: 784.00 },
+        { no: 2, description: "Slaked Lime", ref: "M-115", unit: "kg", quantity: 8, rate: 275.00, amount: 2200.00 },
+        { no: 3, description: "Sand", ref: "M-113", unit: "Cu", quantity: 0.05, rate: 20000.00, amount: 1000.00 },
+        { no: 4, description: "Water", ref: "M-157", unit: "Gal", quantity: 5, rate: 0.30, amount: 1.50 },
+        { no: 5, description: "Mason", ref: "L-009", unit: "Day", quantity: 2, rate: 2500.00, amount: 5000.00 },
+        { no: 6, description: "U / SK Labourer", ref: "L-007", unit: "Day", quantity: 2, rate: 1800.00, amount: 3600.00 },
+        { no: 7, description: "Scaffolding", ref: "", unit: "", quantity: null, rate: null, amount: 258.00 },
+      ],
+      totalAmount: 12059.50,
+      rates: [
+        { type: "1Sq", amount: 12060.00 },
+        { type: "1ft2", amount: 120.60 },
+        { type: "1m2", amount: 1297.66 },
+      ],
+      floors: [
+        { flo: "Ground floor", rate: "1m2", amount: 1297.66 },
+        { flo: "First Floor", rate: "1m2", amount: 1427.42 },
+        { flo: "Second Floor", rate: "1m2", amount: 1570.16 },
+        { flo: "Third Floor", rate: "1m2", amount: 1727.18 },
+      ],
+    },
   ];
 
-  return (
-    <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">
-      {tableData.map((table, index) => (
-        <TableComponent key={index} {...table} />
-      ))}
-    </div>
-  );
+  return <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">{tableData.map((table, index) => <TableComponent key={index} {...table} />)}</div>;
 }
