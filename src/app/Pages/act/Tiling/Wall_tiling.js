@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
@@ -23,9 +23,9 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           <tbody>
             {data.map((row, index) => (
               <tr key={index} className="text-center border-b hover:bg-gray-100">
-                <td className="p-2 border">{index + 1}</td>
-                <td className="p-2 border text-left">{row.item_description}</td>
-                <td className="p-2 border">{row.item_ref || '-'}</td>
+                <td className="p-2 border">{row.no}</td>
+                <td className="p-2 border text-left">{row.description}</td>
+                <td className="p-2 border">{row.ref || '-'}</td>
                 <td className="p-2 border">{row.unit || '-'}</td>
                 <td className="p-2 border">{row.quantity !== undefined ? row.quantity : '-'}</td>
                 <td className="p-2 border">{row.rate !== undefined ? row.rate : '-'}</td>
@@ -76,70 +76,75 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   );
 };
 
+
+
 export default function LabourAnalysis() {
-  const tableData = [
+
+  const [tableData, setTableData] = useState([]);
+        
+          const exampleData= [
     {
       title: "Glazed tiles fixed to walls including bedding in cement mortar 1:2 and raking in ground floor. (Specials measured separately)",
       data: [
         {
-          item_description: "Glazed Tiles (6''x6\")",
-          item_ref: "M-155",
+          description: "Glazed Tiles (6''x6\")",
+          ref: "M-155",
           unit: "No",
           quantity: 400,
           rate: 75.00,
           amount: 30000.00
         },
         {
-          item_description: "Allow 10% of Items (1.01) for Wastage",
-          item_ref: "-",
+          description: "Allow 10% of Items (1.01) for Wastage",
+          ref: "-",
           unit: "-",
           quantity: "-",
           rate: "-",
           amount: 3000.00
         },
         {
-          item_description: "Cement",
-          item_ref: "M-026",
+          description: "Cement",
+          ref: "M-026",
           unit: "Bag",
           quantity: 2.5,
           rate: 980.00,
           amount: 2450.00
         },
         {
-          item_description: "Sand",
-          item_ref: "M-113",
+          description: "Sand",
+          ref: "M-113",
           unit: "Cu",
           quantity: 0.11,
           rate: 20000.00,
           amount: 2200.00
         },
         {
-          item_description: "White Cement",
-          item_ref: "M-159",
+          description: "White Cement",
+          ref: "M-159",
           unit: "Lbs",
           quantity: 1,
           rate: 17.50,
           amount: 17.50
         },
         {
-          item_description: "Mason",
-          item_ref: "L-009",
+          description: "Mason",
+          ref: "L-009",
           unit: "Day",
           quantity: 4,
           rate: 900.00,
           amount: 3600.00
         },
         {
-          item_description: "U / SK Labourer",
-          item_ref: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 4,
           rate: 600.00,
           amount: 2400.00
         },
         {
-          item_description: "U / SK Labourer",
-          item_ref: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 0.25,
           rate: 600.00,
@@ -163,64 +168,64 @@ export default function LabourAnalysis() {
       title: "Glazed tiles fixed to walls including bedding in cement mortar 1:2 and raking in ground floor. (Specials measured separately)",
       data: [
         {
-          item_description: "Glazed Tiles (8''x12\")",
-          item_ref: "M-156",
+          description: "Glazed Tiles (8''x12\")",
+          ref: "M-156",
           unit: "No",
           quantity: 150,
           rate: 100.00,
           amount: 15000.00
         },
         {
-          item_description: "Allow 10% of Items (1.01) for Wastage",
-          item_ref: "-",
+          description: "Allow 10% of Items (1.01) for Wastage",
+          ref: "-",
           unit: "-",
           quantity: "-",
           rate: "-",
           amount: 1500.00
         },
         {
-          item_description: "Cement",
-          item_ref: "M-026",
+          description: "Cement",
+          ref: "M-026",
           unit: "Bag",
           quantity: 2.5,
           rate: 980.00,
           amount: 2450.00
         },
         {
-          item_description: "Sand",
-          item_ref: "M-113",
+          description: "Sand",
+          ref: "M-113",
           unit: "Cu",
           quantity: 0.11,
           rate: 20000.00,
           amount: 2200.00
         },
         {
-          item_description: "White Cement",
-          item_ref: "M-159",
+          description: "White Cement",
+          ref: "M-159",
           unit: "Lbs",
           quantity: 1,
           rate: 17.50,
           amount: 17.50
         },
         {
-          item_description: "Mason",
-          item_ref: "L-009",
+          description: "Mason",
+          ref: "L-009",
           unit: "Day",
           quantity: 4,
           rate: 2500.00,
           amount: 10000.00
         },
         {
-          item_description: "U / SK Labourer",
-          item_ref: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 4,
           rate: 1800.00,
           amount: 7200.00
         },
         {
-          item_description: "U / SK Labourer",
-          item_ref: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 0.25,
           rate: 600.00,
@@ -242,18 +247,91 @@ export default function LabourAnalysis() {
     }
   ];
 
-  return (
-    <div>
-      {tableData.map((dataItem, index) => (
-        <TableComponent
-          key={index}
-          title={dataItem.title}
-          data={dataItem.data}
-          totalAmount={dataItem.totalAmount}
-          rates={dataItem.rates}
-          floors={dataItem.floors}
-        />
-      ))}
-    </div>
-  );
-}
+ useEffect(() => {
+             const fetchRates = async () => {
+               try {
+                 const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+                 const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+             
+                 if (materialResponse.ok && labourResponse.ok) {
+                   const materialData = await materialResponse.json();
+                   const labourData = await labourResponse.json();
+             
+                   const updatedData = exampleData.map(item => {
+                     let total = 0;
+             
+                     // Iterate over each row in the data to calculate values
+                     const updatedRows = item.data.map((row, index) => {
+                       let rate = getRate(row.ref, labourData, materialData);
+                       let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+             
+                       // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+                       if (row.description === "Allow 5% of Items ( 1.01 ) for Wastage") {
+                         const mainItemAmount = item.data[0]?.amount || 0; // Get the amount of the first item (1.01)
+                         row.amount = mainItemAmount * 10 / 100; // Apply 5% wastage
+                         amount = row.amount; // Update amount to the calculated wastage
+                       }
+             
+                       // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+                       if (row.description === "Allow 10% of Items (1.01) for Wastage") {
+                         const masonAmount = item.data[0]?.amount || 0; // Get the amount for Mason (1.06)
+                        
+                         
+                         row.amount = masonAmount * 1.5 / 100; // Apply 5% wastage on mason and labourer
+                         amount = row.amount; // Update amount to the calculated scaffolding wastage
+                       }
+             
+                       total += amount;
+             
+                       return { ...row, rate, amount };
+                     });
+             
+                     return {
+                       ...item,
+                       data: updatedRows,
+                       totalAmount: total,
+                       rates: [
+                         { type: '1 Sq', amount: total },
+                         { type: '1 ft²', amount: total / 100 },
+                         { type: '1 m²', amount: total / 929.03 },
+                       ],
+                       floorRates: [
+                         { floor: "Ground Floor", rate: total / 929.03 },
+                         { floor: "First Floor", rate: 1481.75 },
+                         { floor: "Second Floor", rate: 1481.75 },
+                         { floor: "Third Floor", rate: 1481.75 },
+                       ],
+                     };
+                   });
+             
+                   setTableData(updatedData);
+                 }
+               } catch (error) {
+                 console.error('Error fetching rates:', error);
+               }
+             };
+             
+              
+                fetchRates();
+              }, []);
+              
+              const getRate = (ref, labourData, materialData) => {
+                if (!ref) return 0;
+                if (ref.startsWith('L')) {
+                  return labourData.find(item => item.Code_no === ref)?.price || 0;
+                }
+                if (ref.startsWith('M')) {
+                  return materialData.find(item => item.Code_no === ref)?.price || 0;
+                }
+                return 0;
+              };
+            
+              return (
+                <div className="space-y-6">
+                  {tableData.map((item, index) => (
+                    <TableComponent key={index} {...item} />
+                  ))}
+                </div>
+              );
+            }
+         

@@ -12,7 +12,7 @@ const sections = [
   { name: 'Random Rubble Masonry Work', link: '/pages/act/Random_rubble' },
   { name: 'Concrete Work', link: '/pages/act/Concrete' },
   { name: 'Formwork', link:'/pages/act/Formwork' },
-  { name: 'Reinforcement', link: '/pages/act/earth-work' },
+  { name: 'Reinforcement', link: '/pages/act/Reinforcement' },
   { name: 'Block Work', link: '/pages/act/Block-work' },
   { name: 'Brick Work', link: '/pages/act/Brick-work' },
   { name: 'Roof', link: '/pages/act/Roof_covering' },

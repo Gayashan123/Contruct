@@ -1,12 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
     <div className="p-4 bg-gray-100 w-full flex flex-col items-center">
       <div className="w-full max-w-5xl bg-white shadow-md rounded-lg overflow-hidden p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center border-b pb-2">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center border-b pb-2">
+          {title}
+        </h2>
 
         <table className="w-full border-collapse text-sm">
           <thead className="bg-gray-700 text-white">
@@ -22,18 +24,27 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           </thead>
           <tbody>
             {data.map((row, index) => (
-              <tr key={index} className="text-center border-b hover:bg-gray-100">
+              <tr
+                key={index}
+                className="text-center border-b hover:bg-gray-100"
+              >
                 <td className="p-2 border">{row.no}</td>
                 <td className="p-2 border text-left">{row.description}</td>
-                <td className="p-2 border">{row.ref || '-'}</td>
-                <td className="p-2 border">{row.unit || '-'}</td>
-                <td className="p-2 border">{row.quantity !== undefined ? row.quantity : '-'}</td>
-                <td className="p-2 border">{row.rate !== undefined ? row.rate : '-'}</td>
+                <td className="p-2 border">{row.ref || "-"}</td>
+                <td className="p-2 border">{row.unit || "-"}</td>
+                <td className="p-2 border">
+                  {row.quantity !== undefined ? row.quantity : "-"}
+                </td>
+                <td className="p-2 border">
+                  {row.rate !== undefined ? row.rate : "-"}
+                </td>
                 <td className="p-2 border font-semibold">{row.amount}</td>
               </tr>
             ))}
             <tr className="font-bold text-center bg-gray-300">
-              <td colSpan={6} className="p-2 border">Total</td>
+              <td colSpan={6} className="p-2 border">
+                Total
+              </td>
               <td className="p-2 border">{totalAmount}</td>
             </tr>
           </tbody>
@@ -44,7 +55,10 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           <table className="w-full border-collapse text-sm">
             <tbody>
               {rates.map((rate, index) => (
-                <tr key={index} className="bg-yellow-200 text-center font-semibold border-b">
+                <tr
+                  key={index}
+                  className="bg-yellow-200 text-center font-semibold border-b"
+                >
                   <td className="p-2 border">Rate (Say)</td>
                   <td className="p-2 border">{rate.type}</td>
                   <td className="p-2 border">{rate.amount}</td>
@@ -57,11 +71,16 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
         {/* Floors Section (Only for the second table) */}
         {floors && floors.length > 0 && (
           <div className="mt-4">
-            <h3 className="text-md font-semibold text-gray-800 mb-2 text-center border-b pb-2">Floors Analysis</h3>
+            <h3 className="text-md font-semibold text-gray-800 mb-2 text-center border-b pb-2">
+              Floors Analysis
+            </h3>
             <table className="w-full border-collapse text-sm">
               <tbody>
                 {floors.map((floor, index) => (
-                  <tr key={index} className="bg-blue-200 text-center font-semibold border-b">
+                  <tr
+                    key={index}
+                    className="bg-blue-200 text-center font-semibold border-b"
+                  >
                     <td className="p-2 border">{floor.flo}</td>
                     <td className="p-2 border">{floor.rate}</td>
                     <td className="p-2 border">{floor.amount}</td>
@@ -77,15 +96,17 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
 };
 
 export default function LabourAnalysis() {
-  const tableData = [
+  const [tableData, setTableData] = useState([]);
+
+  const exampleData = [
     {
       title: 'Cement Concrete 1:2:4(3/4") in 6" X 6" Beams Upto 1st floor level',
       data: [
         {
           no: '1.01',
           description: 'Mixing Concrete 1:2:4(3/4")',
-          ref: '05.A.04',
-          unit: 'Cu',
+          ref: 'M-175',
+          unit: 'Cube',
           quantity: 0.45,
           rate: 45_590.00,
           amount: 20_515.50
@@ -178,8 +199,8 @@ export default function LabourAnalysis() {
           {
             "no": "1.01",
             "description": "Mixing Concrete 1:2:4 (3/4\")",
-            "ref": "05.A.04",
-            "unit": "Cu",
+            "ref": "M-175",
+            "unit": "Cube",
             "quantity": 0.45,
             "rate": 45590.00,
             "amount": 20515.50
@@ -271,7 +292,7 @@ export default function LabourAnalysis() {
           {
             "no": "1.01",
             "description": "Mixing Concrete 1:2:4 (3/4\")",
-            "ref": "05.A.04",
+            "ref": "M-175",
             "unit": "Cu",
             "quantity": 0.45,
             "rate": 45590.00,
@@ -372,11 +393,120 @@ export default function LabourAnalysis() {
 
   ];
 
-  return (
-    <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">
-      {tableData.map((table, index) => (
-        <TableComponent key={index} {...table} />
-      ))}
-    </div>
-  );
-}
+ useEffect(() => {
+     const fetchRates = async () => {
+       try {
+         const materialResponse = await fetch("/api/material_rate", {
+           headers: { "Cache-Control": "no-cache" },
+         });
+         const labourResponse = await fetch("/api/labour_rate", {
+           headers: { "Cache-Control": "no-cache" },
+         })
+           const plantResponse = await fetch("/api/plant_rate", {
+            headers: { "Cache-Control": "no-cache" },
+ 
+
+
+         });
+ 
+         if (materialResponse.ok && labourResponse.ok) {
+           const materialData = await materialResponse.json();
+           const labourData = await labourResponse.json();
+           const plantData = await plantResponse.json();
+ 
+           const updatedData = exampleData.map((item) => {
+             let total = 0;
+ 
+             // Iterate over each row in the data to calculate values
+             const updatedRows = item.data.map((row, index) => {
+               let rate = getRate(row.ref, labourData, materialData,plantData);
+               let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+ 
+               // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+               if (row.description === "Allow 5% Wastage") {
+                 const mainItemAmount = item.data[0]?.amount || 0; // Get the amount of the first item (1.01)
+                 row.amount = (mainItemAmount * 5) / 100; // Apply 5% wastage
+                 amount = row.amount; // Update amount to the calculated wastage
+               }
+ 
+               // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+               if (
+                 row.description ===
+                 "Allow 20% of Items for Steel Fuel and Forge"
+               ) {
+                 const masonAmount = item.data[1]?.amount || 0; // Get the amount for Mason (1.06)
+ 
+                 row.amount = (masonAmount * 20) / 100; // Apply 5% wastage on mason and labourer
+                 amount = row.amount; // Update amount to the calculated scaffolding wastage
+               }
+ 
+               if (
+                 row.description === "Allow 25% of Items for Steel, Fuel & Forge"
+               ) {
+                 const masonAmount = item.data[0]?.amount || 0; // Get the amount for Mason (1.06)
+ 
+                 row.amount = (masonAmount * 25) / 100; // Apply 5% wastage on mason and labourer
+                 amount = row.amount; // Update amount to the calculated scaffolding wastage
+               }
+ 
+               total += amount;
+ 
+               return { ...row, rate, amount };
+             });
+ 
+             return {
+               ...item,
+               data: updatedRows,
+               totalAmount: total,
+               rates: [
+                 { type: "1 Sq", amount: total },
+                 { type: "1 ft²", amount: total / 100 },
+                 { type: "1 m²", amount: total / 929.03 },
+               ],
+               floorRates: [
+                 { floor: "Ground Floor", rate: total / 929.03 },
+                 { floor: "First Floor", rate: 1481.75 },
+                 { floor: "Second Floor", rate: 1481.75 },
+                 { floor: "Third Floor", rate: 1481.75 },
+               ],
+             };
+           });
+ 
+           setTableData(updatedData);
+         }
+       } catch (error) {
+         console.error("Error fetching rates:", error);
+       }
+     };
+ 
+     fetchRates();
+   }, []);
+ 
+   const getRate = (ref, labourData, materialData,plantData) => {
+     if (!ref) return 0;
+     if (ref.startsWith("L")) {
+       return labourData.find((item) => item.Code_no === ref)?.price || 0;
+     }
+     if (ref.startsWith("M")) {
+       return materialData.find((item) => item.Code_no === ref)?.price || 0;
+     }
+
+     if (ref.startsWith("P")) {
+      return plantData.find((item) => item.Code_no === ref)?.price || 0;
+    }
+
+
+
+
+     return 0;
+   };
+ 
+   return (
+     <div className="space-y-6">
+       {tableData.map((item, index) => (
+         <TableComponent key={index} {...item} />
+       ))}
+     </div>
+   );
+ }
+ 

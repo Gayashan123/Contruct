@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
@@ -54,7 +54,7 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           </table>
         </div>
 
-        {/* Floors Section */}
+        {/* Floors Section (Only for the second table) */}
         {floors && floors.length > 0 && (
           <div className="mt-4">
             <h3 className="text-md font-semibold text-gray-800 mb-2 text-center border-b pb-2">Floors Analysis</h3>
@@ -76,8 +76,13 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   );
 };
 
+
+
 export default function LabourAnalysis() {
-  const tableData = [
+
+  const [tableData, setTableData] = useState([]);
+        
+          const exampleData = [
     {
       "title": "5/8\" thick plastering to wall in Cement and sand 1:3 including Cement floating",
       "data": [
@@ -527,11 +532,103 @@ export default function LabourAnalysis() {
     }
   ];
 
-  return (
-    <div className="p-6 bg-gray-200 min-h-screen flex flex-col items-center">
-      {tableData.map((table, index) => (
-        <TableComponent key={index} {...table} />
-      ))}
-    </div>
-  );
-}
+   useEffect(() => {
+                const fetchRates = async () => {
+                  try {
+                    const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+                    const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+                
+                    if (materialResponse.ok && labourResponse.ok) {
+                      const materialData = await materialResponse.json();
+                      const labourData = await labourResponse.json();
+                
+                      const updatedData = exampleData.map(item => {
+                        let total = 0;
+                
+                        // Iterate over each row in the data to calculate values
+                        const updatedRows = item.data.map((row, index) => {
+                          let rate = getRate(row.ref, labourData, materialData);
+                          let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+                
+                          // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+                          if (row.description === "Allow 2.5% of Items for Tools") {
+                            const mainItemAmount = item.data[0]?.amount || 0; // Get the amount of the first item (1.01)
+                            row.amount = mainItemAmount * 2.5 / 100; // Apply 5% wastage
+                            amount = row.amount; // Update amount to the calculated wastage
+                          }
+                
+                          // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+                          if (row.description === "Allow 20% of Items for Steel Fuel and Forge") {
+                            const masonAmount = item.data[1]?.amount || 0; // Get the amount for Mason (1.06)
+                           
+                            
+                            row.amount = masonAmount * 20/ 100; // Apply 5% wastage on mason and labourer
+                            amount = row.amount; // Update amount to the calculated scaffolding wastage
+                          }
+    
+                          if (row.description === "Allow 25% of Items for Steel, Fuel & Forge") {
+                            const masonAmount = item.data[0]?.amount || 0; // Get the amount for Mason (1.06)
+                           
+                            
+                            row.amount = masonAmount * 25 / 100; // Apply 5% wastage on mason and labourer
+                            amount = row.amount; // Update amount to the calculated scaffolding wastage
+                          }
+    
+    
+    
+    
+                
+                          total += amount;
+                
+                          return { ...row, rate, amount };
+                        });
+                
+                        return {
+                          ...item,
+                          data: updatedRows,
+                          totalAmount: total,
+                          rates: [
+                            { type: '1 Sq', amount: total },
+                            { type: '1 ft²', amount: total / 100 },
+                            { type: '1 m²', amount: total / 929.03 },
+                          ],
+                          floorRates: [
+                            { floor: "Ground Floor", rate: total / 929.03 },
+                            { floor: "First Floor", rate: 1481.75 },
+                            { floor: "Second Floor", rate: 1481.75 },
+                            { floor: "Third Floor", rate: 1481.75 },
+                          ],
+                        };
+                      });
+                
+                      setTableData(updatedData);
+                    }
+                  } catch (error) {
+                    console.error('Error fetching rates:', error);
+                  }
+                };
+                
+                 
+                   fetchRates();
+                 }, []);
+                 
+                 const getRate = (ref, labourData, materialData) => {
+                   if (!ref) return 0;
+                   if (ref.startsWith('L')) {
+                     return labourData.find(item => item.Code_no === ref)?.price || 0;
+                   }
+                   if (ref.startsWith('M')) {
+                     return materialData.find(item => item.Code_no === ref)?.price || 0;
+                   }
+                   return 0;
+                 };
+               
+                 return (
+                   <div className="space-y-6">
+                     {tableData.map((item, index) => (
+                       <TableComponent key={index} {...item} />
+                     ))}
+                   </div>
+                 );
+               }
+            

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from "react";
 
 const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
@@ -23,9 +23,9 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
           <tbody>
             {data.map((row, index) => (
               <tr key={index} className="text-center border-b hover:bg-gray-100">
-                <td className="p-2 border">{index + 1}</td>
-                <td className="p-2 border text-left">{row.itemDescription}</td>
-                <td className="p-2 border">{row.itemRef || '-'}</td>
+                <td className="p-2 border">{row.no}</td>
+                <td className="p-2 border text-left">{row.description}</td>
+                <td className="p-2 border">{row.ref || '-'}</td>
                 <td className="p-2 border">{row.unit || '-'}</td>
                 <td className="p-2 border">{row.quantity !== undefined ? row.quantity : '-'}</td>
                 <td className="p-2 border">{row.rate !== undefined ? row.rate : '-'}</td>
@@ -62,7 +62,7 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
               <tbody>
                 {floors.map((floor, index) => (
                   <tr key={index} className="bg-blue-200 text-center font-semibold border-b">
-                    <td className="p-2 border">{floor.name}</td>
+                    <td className="p-2 border">{floor.flo}</td>
                     <td className="p-2 border">{floor.rate}</td>
                     <td className="p-2 border">{floor.amount}</td>
                   </tr>
@@ -76,86 +76,91 @@ const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   );
 };
 
+
+
 export default function LabourAnalysis() {
-  const tableData = [
+
+  const [tableData, setTableData] = useState([]);
+        
+          const exampleData = [
     {
       title: "14.B.01 Terrazzo floor tiles on 1/2\" thick cement and sand 1:2 in ground floor",
       data: [
         {
-          itemDescription: "Terrazzo Tiles 12\" X 12\"",
-          itemRef: "M-132",
+          description: "Terrazzo Tiles 12\" X 12\"",
+          ref: "M-132",
           unit: "No",
           quantity: 100,
           rate: 350.00,
           amount: 35000.00
         },
         {
-          itemDescription: "Allow 5% of Items ( 1.01 ) for Wastage",
-          itemRef: "-",
+          description: "Allow 5% of Items ( 1.01 ) for Wastage",
+          ref: "-",
           unit: "-",
-          quantity: "-",
-          rate: "-",
+          quantity: 0,
+          rate: 0,
           amount: 1750.00
         },
         {
-          itemDescription: "Cement",
-          itemRef: "M-026",
+          description: "Cement",
+          ref: "M-026",
           unit: "Bag",
           quantity: 1.25,
           rate: 730.00,
           amount: 912.50
         },
         {
-          itemDescription: "Sand",
-          itemRef: "M-113",
+          description: "Sand",
+          ref: "M-113",
           unit: "Cu",
           quantity: 0.07,
           rate: 20000.00,
           amount: 1400.00
         },
         {
-          itemDescription: "Coloured Pigment",
-          itemRef: "M-035",
+          description: "Coloured Pigment",
+          ref: "M-035",
           unit: "Lbs",
           quantity: 2,
           rate: 175.00,
           amount: 350.00
         },
         {
-          itemDescription: "Wax Polish",
-          itemRef: "M-158",
+          description: "Wax Polish",
+          ref: "M-158",
           unit: "Lbs",
           quantity: 0.5,
           rate: 150.00,
           amount: 75.00
         },
         {
-          itemDescription: "Cotton Waste",
-          itemRef: "M-037",
+          description: "Cotton Waste",
+          ref: "M-037",
           unit: "Lbs",
           quantity: 2,
           rate: 12.50,
           amount: 25.00
         },
         {
-          itemDescription: "Mason",
-          itemRef: "L-009",
+          description: "Mason",
+          ref: "L-009",
           unit: "Day",
           quantity: 4,
           rate: 900.00,
           amount: 3600.00
         },
         {
-          itemDescription: "U / SK Labourer",
-          itemRef: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 3,
           rate: 1800.00,
           amount: 5400.00
         },
         {
-          itemDescription: "U / SK Labourer",
-          itemRef: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 0.5,
           rate: 1800.00,
@@ -179,72 +184,72 @@ export default function LabourAnalysis() {
       title: "14.B.02 Pressed floor tiles bedded in 1/2\" cement mortar 1:2 and pointing in neat cement in ground floor",
       data: [
         {
-          itemDescription: "Pressed Tiles 8\" X 8\"",
-          itemRef: "M-130",
+          description: "Pressed Tiles 8\" X 8\"",
+          ref: "M-130",
           unit: "No",
           quantity: 225,
           rate: 125.00,
           amount: 28125.00
         },
         {
-          itemDescription: "Allow 5% of Items ( 1.01 ) for Wastage",
-          itemRef: "-",
+          description: "Allow 5% of Items ( 1.01 ) for Wastage",
+          ref: "-",
           unit: "-",
-          quantity: "-",
-          rate: "-",
+          quantity: 0,
+          rate: 0,
           amount: 1406.25
         },
         {
-          itemDescription: "Cement",
-          itemRef: "M-026",
+          description: "Cement",
+          ref: "M-026",
           unit: "Bag",
           quantity: 1.25,
           rate: 980.00,
           amount: 1225.00
         },
         {
-          itemDescription: "Sand",
-          itemRef: "M-113",
+          description: "Sand",
+          ref: "M-113",
           unit: "Cu",
           quantity: 0.07,
           rate: 20000.00,
           amount: 1400.00
         },
         {
-          itemDescription: "Colouring Powder",
-          itemRef: "M-036",
+          description: "Colouring Powder",
+          ref: "M-036",
           unit: "Lbs",
           quantity: 0.25,
           rate: 175.00,
           amount: 43.75
         },
         {
-          itemDescription: "Cotton Waste",
-          itemRef: "M-037",
+          description: "Cotton Waste",
+          ref: "M-037",
           unit: "Lbs",
           quantity: 2,
           rate: 12.50,
           amount: 25.00
         },
         {
-          itemDescription: "Mason",
-          itemRef: "L-009",
+          description: "Mason",
+          ref: "L-009",
           unit: "Day",
           quantity: 4,
           rate: 2500.00,
           amount: 10000.00
         },
         {
-          itemDescription: "U / SK Labourer",
-          itemRef: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 4,
           rate: 1800.00,
           amount: 7200.00
         },
         {
-          itemDescription: "U / SK Labourer",
-          itemRef: "L-007",
+          description: "U / SK Labourer",
+          ref: "L-007",
           unit: "Day",
           quantity: 0.5,
           rate: 1800.00,
@@ -265,19 +270,91 @@ export default function LabourAnalysis() {
       ]
     }
   ];
-
-  return (
-    <div>
-      {tableData.map((table, index) => (
-        <TableComponent
-          key={index}
-          title={table.title}
-          data={table.data}
-          totalAmount={table.totalAmount}
-          rates={table.rates}
-          floors={table.floors}
-        />
-      ))}
-    </div>
-  );
-}
+ useEffect(() => {
+            const fetchRates = async () => {
+              try {
+                const materialResponse = await fetch('/api/material_rate', { headers: { 'Cache-Control': 'no-cache' } });
+                const labourResponse = await fetch('/api/labour_rate', { headers: { 'Cache-Control': 'no-cache' } });
+            
+                if (materialResponse.ok && labourResponse.ok) {
+                  const materialData = await materialResponse.json();
+                  const labourData = await labourResponse.json();
+            
+                  const updatedData = exampleData.map(item => {
+                    let total = 0;
+            
+                    // Iterate over each row in the data to calculate values
+                    const updatedRows = item.data.map((row, index) => {
+                      let rate = getRate(row.ref, labourData, materialData);
+                      let amount = row.quantity !== undefined ? row.quantity * rate : 0;
+            
+                      // Calculate wastage for "Allow 5% of Items (1.01) for Wastage"
+                      if (row.description === "Allow 5% of Items ( 1.01 ) for Wastage") {
+                        const mainItemAmount = item.data[0]?.amount || 0; // Get the amount of the first item (1.01)
+                        row.amount = mainItemAmount * 10 / 100; // Apply 5% wastage
+                        amount = row.amount; // Update amount to the calculated wastage
+                      }
+            
+                      // Calculate scaffolding wastage for "Allow 5% of Items (1.06, 1.07) for Scaffolding"
+                      if (row.description === "Allow 10% of Items (1.01) for Wastage") {
+                        const masonAmount = item.data[0]?.amount || 0; // Get the amount for Mason (1.06)
+                       
+                        
+                        row.amount = masonAmount * 1.5 / 100; // Apply 5% wastage on mason and labourer
+                        amount = row.amount; // Update amount to the calculated scaffolding wastage
+                      }
+            
+                      total += amount;
+            
+                      return { ...row, rate, amount };
+                    });
+            
+                    return {
+                      ...item,
+                      data: updatedRows,
+                      totalAmount: total,
+                      rates: [
+                        { type: '1 Sq', amount: total },
+                        { type: '1 ft²', amount: total / 100 },
+                        { type: '1 m²', amount: total / 929.03 },
+                      ],
+                      floorRates: [
+                        { floor: "Ground Floor", rate: total / 929.03 },
+                        { floor: "First Floor", rate: 1481.75 },
+                        { floor: "Second Floor", rate: 1481.75 },
+                        { floor: "Third Floor", rate: 1481.75 },
+                      ],
+                    };
+                  });
+            
+                  setTableData(updatedData);
+                }
+              } catch (error) {
+                console.error('Error fetching rates:', error);
+              }
+            };
+            
+             
+               fetchRates();
+             }, []);
+             
+             const getRate = (ref, labourData, materialData) => {
+               if (!ref) return 0;
+               if (ref.startsWith('L')) {
+                 return labourData.find(item => item.Code_no === ref)?.price || 0;
+               }
+               if (ref.startsWith('M')) {
+                 return materialData.find(item => item.Code_no === ref)?.price || 0;
+               }
+               return 0;
+             };
+           
+             return (
+               <div className="space-y-6">
+                 {tableData.map((item, index) => (
+                   <TableComponent key={index} {...item} />
+                 ))}
+               </div>
+             );
+           }
+        

@@ -1,6 +1,8 @@
-import React from 'react';
+'use client';
 
-const TableComponent = ({ title, data, totalAmount, rates }) => {
+import React, { useState, useEffect } from "react";
+
+const TableComponent = ({ title, data, totalAmount, rates, floors }) => {
   return (
     <div className="p-4 bg-gray-100 w-full flex flex-col items-center">
       <div className="w-full max-w-5xl bg-white shadow-md rounded-lg overflow-hidden p-6 mb-6">
@@ -51,13 +53,36 @@ const TableComponent = ({ title, data, totalAmount, rates }) => {
             </tbody>
           </table>
         </div>
+
+        {/* Floors Section (Only for the second table) */}
+        {floors && floors.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-md font-semibold text-gray-800 mb-2 text-center border-b pb-2">Floors Analysis</h3>
+            <table className="w-full border-collapse text-sm">
+              <tbody>
+                {floors.map((floor, index) => (
+                  <tr key={index} className="bg-blue-200 text-center font-semibold border-b">
+                    <td className="p-2 border">{floor.flo}</td>
+                    <td className="p-2 border">{floor.rate}</td>
+                    <td className="p-2 border">{floor.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
+
+
 export default function LabourAnalysis() {
-  const tableData = [
+
+  const [tableData, setTableData] = useState([]);
+        
+          const exampleData = [
     {
       title: 'Mixing Concrete 1:1-1/2:3(3/4")',
       data: [
@@ -150,17 +175,97 @@ export default function LabourAnalysis() {
     }
   ];
 
-  return (
-    <div className="space-y-6">
-      {tableData.map((item, index) => (
-        <TableComponent
-          key={index}
-          title={item.title}
-          data={item.data}
-          totalAmount={item.totalAmount}
-          rates={item.rates}
-        />
-      ))}
-    </div>
-  );
-}
+    useEffect(() => {
+       const fetchRates = async () => {
+           try {
+               const materialResponse = await fetch("/api/material_rate", {
+                   headers: { "Cache-Control": "no-cache" },
+               });
+               const labourResponse = await fetch("/api/labour_rate", {
+                   headers: { "Cache-Control": "no-cache" },
+               });
+               const plantResponse = await fetch("/api/plant_rate", {
+                   headers: { "Cache-Control": "no-cache" },
+               });
+   
+               if (materialResponse.ok && labourResponse.ok && plantResponse.ok) {
+                   const materialData = await materialResponse.json();
+                   const labourData = await labourResponse.json();
+                   const plantData = await plantResponse.json();
+   
+                   const updatedData = exampleData.map((item) => {
+                       let total = 0;
+   
+                       const updatedRows = item.data.map((row) => {
+                           let rate = getRate(row.ref, labourData, materialData, plantData);
+                           let amount = row.quantity && rate ? row.quantity * rate : 0;
+   
+                           // Logic for calculate the Allow 5% Wastage
+                           if (row.description === "Allow 5% Wastage") {
+                               const mainItem = item.data.find((r) => r.no === "1.01");
+                               if (mainItem) {
+                                   const mainItemAmount = mainItem.amount || 0;
+                                   row.amount = mainItemAmount * 0.05;  // Calculate 5% wastage
+                                   amount = row.amount; // Update the amount for the total calculation
+                               } else {
+                                   row.amount = 0; // If main item not found, set wastage to 0
+                                   amount = 0; // Ensure amount is also 0
+                               }
+                           }
+   
+                           total += amount;
+                           return { ...row, rate, amount };
+                       });
+   
+                       return {
+                           ...item,
+                           data: updatedRows,
+                           totalAmount: total.toFixed(2),
+                           rates: [
+                               { type: "1 Cube", amount: total },
+                               { type: "1 L.ft", amount: total / 100 },
+                           ],
+                       };
+                   });
+   
+                   setTableData(updatedData);
+               } else {
+                   console.error("Error fetching one or more rates");
+               }
+           } catch (error) {
+               console.error("Error fetching rates:", error);
+           }
+       };
+   
+       fetchRates();
+   }, []);
+   
+       
+         const getRate = (ref, labourData, materialData,plantData) => {
+           if (!ref) return 0;
+           if (ref.startsWith("L")) {
+             return labourData.find((item) => item.Code_no === ref)?.price || 0;
+           }
+           if (ref.startsWith("M")) {
+             return materialData.find((item) => item.Code_no === ref)?.price || 0;
+           }
+      
+           if (ref.startsWith("P")) {
+            return plantData.find((item) => item.Code_no === ref)?.price || 0;
+          }
+      
+      
+      
+      
+           return 0;
+         };
+       
+         return (
+           <div className="space-y-6">
+             {tableData.map((item, index) => (
+               <TableComponent key={index} {...item} />
+             ))}
+           </div>
+         );
+       }
+       

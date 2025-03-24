@@ -8,8 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "var(--background)",  // Custom property for background
+        foreground: "var(--foreground)",  // Custom property for foreground
+      },
+      fontFamily: {
+        geist: ['Geist Mono', 'monospace'],  // Adding custom font family
       },
     },
   },
