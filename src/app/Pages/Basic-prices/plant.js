@@ -90,7 +90,7 @@ export default function Plant() {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="bg-white shadow-lg rounded-lg p-6">
-      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Materials Table</h1>
+      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Plant Basic Price Table </h1>
 
         <div className="flex mb-4 space-x-4">
           <button onClick={addPlant} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -102,50 +102,54 @@ export default function Plant() {
             </button>
           )}
         </div>
-
         {isLoading ? (
-          <p className="text-center">Loading...</p>
-        ) : (
-          <table className="w-full table-auto bg-white shadow-md rounded-lg">
-            <thead className="bg-gray-700 text-white">
-              <tr>
-                <th className="py-2 px-4">Description</th>
-                <th className="py-2 px-4">Basic Price</th>
-                <th className="py-2 px-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plantData.map((plant, index) => (
-                <tr key={index} className="border-t hover:bg-gray-100">
-                  <td className="py-2 px-4">
-                    <input
-                      type="text"
-                      value={plant.description}
-                      onChange={(e) => updatePlant(index, "description", e.target.value)}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
-                    />
-                  </td>
-                  <td className="py-2 px-4">
-                    <input
-                      type="number"
-                      value={plant.basic_price}
-                      onChange={(e) => updatePlant(index, "basic_price", e.target.value)}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
-                    />
-                  </td>
-                  <td className="py-2 px-4 text-center">
-                    <button
-                      onClick={() => deleteRow(index)}
-                      className="bg-red-600 text-white px-4 py-1 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+  <div className="text-center">
+    <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+    <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+  </div>
+) : (
+  <table className="w-full table-auto bg-white shadow-md rounded-lg">
+    <thead className="bg-gray-700 text-white">
+      <tr>
+        <th className="py-2 px-4">Description</th>
+        <th className="py-2 px-4">Basic Price</th>
+        <th className="py-2 px-4">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {plantData.map((plant, index) => (
+        <tr key={index} className="border-t hover:bg-gray-100">
+          <td className="py-2 px-4">
+            <input
+              type="text"
+              value={plant.description}
+              onChange={(e) => updatePlant(index, "description", e.target.value)}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td className="py-2 px-4">
+            <input
+              type="number"
+              value={plant.basic_price}
+              onChange={(e) => updatePlant(index, "basic_price", e.target.value)}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td className="py-2 px-4 text-center">
+            <button
+              onClick={() => deleteRow(index)}
+              className="bg-red-600 text-white px-4 py-1 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
+        
       </div>
     </div>
   );

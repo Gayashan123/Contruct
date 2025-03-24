@@ -118,57 +118,64 @@ export default function LabourRate() {
         </button>
       )}
 
-      {isLoading ? (
-        <p className="text-center mt-4">Loading data...</p>
-      ) : (
-        <table className="w-full mt-4 border bg-white shadow-md">
-          <thead className="bg-gray-700 text-white">
-            <tr>
-              <th className="p-3">Description</th>
-              <th className="p-3">Unit</th>
-              <th className="p-3">Basic Price</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {labourData.map((labour, index) => (
-              <tr key={labour._id || `temp-${index}`} className="border-b text-center hover:bg-gray-200">
-                <td className="p-3">
-                  <input
-                    type="text"
-                    value={labour.description}
-                    onChange={(e) => updateLabour(index, "description", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <select
-                    value={labour.unit}
-                    onChange={(e) => updateLabour(index, "unit", e.target.value)}
-                    className="border p-2 w-full"
-                  >
-                    <option value="Day">Day</option>
-                    <option value="Hour">Hour</option>
-                  </select>
-                </td>
-                <td className="p-3">
-                  <input
-                    type="number"
-                    value={labour.price}
-                    onChange={(e) => updateLabour(index, "price", e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </td>
-                <td className="p-3">
-                  <button onClick={() => deleteRow(index)} className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+{isLoading ? (
+  <div className="text-center">
+    <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+    <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+  </div>
+) : (
+  <table className="w-full mt-4 border bg-white shadow-md">
+    <thead className="bg-gray-700 text-white">
+      <tr>
+        <th className="p-3">Description</th>
+        <th className="p-3">Unit</th>
+        <th className="p-3">Basic Price</th>
+        <th className="p-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {labourData.map((labour, index) => (
+        <tr key={labour._id || `temp-${index}`} className="border-b text-center hover:bg-gray-200">
+          <td className="p-3">
+            <input
+              type="text"
+              value={labour.description}
+              onChange={(e) => updateLabour(index, "description", e.target.value)}
+              className="border p-2 w-full"
+            />
+          </td>
+          <td className="p-3">
+            <select
+              value={labour.unit}
+              onChange={(e) => updateLabour(index, "unit", e.target.value)}
+              className="border p-2 w-full"
+            >
+              <option value="Day">Day</option>
+              <option value="Hour">Hour</option>
+            </select>
+          </td>
+          <td className="p-3">
+            <input
+              type="number"
+              value={labour.price}
+              onChange={(e) => updateLabour(index, "price", e.target.value)}
+              className="border p-2 w-full"
+            />
+          </td>
+          <td className="p-3">
+            <button onClick={() => deleteRow(index)} className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700">
+              Delete
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
+
+
+      
     </div>
   );
 }

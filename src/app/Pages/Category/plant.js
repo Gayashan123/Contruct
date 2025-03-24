@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export default function Plant() {
   const [plantData, setPlantData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Load data from the API when the component mounts
+  // Load data from API when the component mounts
   useEffect(() => {
     loadPlantData();
   }, []);
 
   const loadPlantData = async () => {
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/plant_rate');
+      const response = await fetch("/api/plant_rate");
+      if (!response.ok) throw new Error("Failed to fetch data");
       const result = await response.json();
-      if (response.ok) {
-        setPlantData(result);
-      } else {
-        setPlantData([]);
-      }
+      setPlantData(result);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       setPlantData([]);
     } finally {
       setIsLoading(false);
@@ -29,17 +27,17 @@ export default function Plant() {
 
   const addPlant = () => {
     const newItemNo = plantData.length + 1;
-    const newCodeNo = `P-${String(newItemNo).padStart(3, '0')}`;
+    const newCodeNo = `P-${String(newItemNo).padStart(3, "0")}`;
     const newPlant = {
       _id: "temp-" + newItemNo,
       Item_No: newItemNo,
       description: "",
       Code_no: newCodeNo,
-      unit: "Day", // Default unit can be something like 'Day', but the user can change it
+      unit: "Day",
       price: "",
       isNew: true,
     };
-    setPlantData([...plantData, newPlant]);
+    setPlantData((prev) => [...prev, newPlant]);
     setHasChanges(true);
   };
 
@@ -66,14 +64,11 @@ export default function Plant() {
         body: JSON.stringify(formattedData),
       });
 
-      const result = await response.json();
-      if (response.ok) {
-        alert("Data saved successfully!");
-        loadPlantData();
-        setHasChanges(false);
-      } else {
-        alert("Failed to save: " + result.message);
-      }
+      if (!response.ok) throw new Error("Failed to save data");
+
+      alert("Data saved successfully!");
+      setHasChanges(false);
+      await loadPlantData();
     } catch (error) {
       console.error("Save error:", error);
       alert("Error saving data");
@@ -81,8 +76,7 @@ export default function Plant() {
   };
 
   const deleteRow = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this plant?");
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this plant?")) return;
 
     if (!id.startsWith("temp-")) {
       try {
@@ -92,8 +86,7 @@ export default function Plant() {
           body: JSON.stringify({ id }),
         });
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || "Failed to delete");
+        if (!response.ok) throw new Error("Failed to delete data");
       } catch (error) {
         console.error("Error deleting:", error);
         alert("Error deleting plant");
@@ -119,55 +112,65 @@ export default function Plant() {
         </button>
       )}
 
-      <table className="w-full mt-4 border bg-white shadow-md">
-        <thead className="bg-gray-700 text-white">
-          <tr>
-            <th className="p-3">Item No</th>
-            <th className="p-3">Code No</th>
-            <th className="p-3">Description</th>
-            <th className="p-3">Unit</th>
-            <th className="p-3">Price (Rs.)</th>
-            <th className="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {plantData.map((plant) => (
-            <tr key={plant._id} className="border-b text-center hover:bg-gray-200">
-              <td className="p-3">{plant.Item_No}</td>
-              <td className="p-3">{plant.Code_no}</td>
-              <td className="p-3">
-                <input
-                  type="text"
-                  value={plant.description}
-                  onChange={(e) => updatePlant(plant._id, "description", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <input
-                  type="text"
-                  value={plant.unit}
-                  onChange={(e) => updatePlant(plant._id, "unit", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <input
-                  type="number"
-                  value={plant.price}
-                  onChange={(e) => updatePlant(plant._id, "price", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <button onClick={() => deleteRow(plant._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
-                  Delete
-                </button>
-              </td>
+      {isLoading ? (
+        <div className="text-center">
+          <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+          <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+        </div>
+      ) : (
+        <table className="w-full mt-4 border bg-white shadow-md">
+          <thead className="bg-gray-700 text-white">
+            <tr>
+              <th className="p-3">Item No</th>
+              <th className="p-3">Code No</th>
+              <th className="p-3">Description</th>
+              <th className="p-3">Unit</th>
+              <th className="p-3">Price (Rs.)</th>
+              <th className="p-3">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {plantData.map((plant) => (
+              <tr key={plant._id} className="border-b text-center hover:bg-gray-200">
+                <td className="p-3">{plant.Item_No}</td>
+                <td className="p-3">{plant.Code_no}</td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={plant.description}
+                    onChange={(e) => updatePlant(plant._id, "description", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={plant.unit}
+                    onChange={(e) => updatePlant(plant._id, "unit", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="number"
+                    value={plant.price}
+                    onChange={(e) => updatePlant(plant._id, "price", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <button
+                    onClick={() => deleteRow(plant._id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

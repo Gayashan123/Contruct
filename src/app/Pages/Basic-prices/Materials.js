@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 
@@ -88,7 +88,7 @@ export default function Materials() {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Materials Table</h1>
+      <h1 className="text-4xl font-bold text-center my-4 bg-gray-800 text-white py-2 rounded-lg">Materials Basic Price Table</h1>
 
       <button onClick={addMaterial} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
         Add Material
@@ -101,7 +101,11 @@ export default function Materials() {
       )}
 
       {isLoading ? (
-        <p className="text-center mt-4">Loading data...</p>
+        <div className="text-center mt-4">
+          {/* Loading Spinner */}
+          <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+          <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+        </div>
       ) : (
         <table className="w-full mt-4 border bg-white shadow-md">
           <thead className="bg-gray-700 text-white">

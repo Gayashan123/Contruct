@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 
@@ -119,48 +119,55 @@ export default function Labour() {
         </button>
       )}
 
-      <table className="w-full mt-4 border bg-white shadow-md">
-        <thead className="bg-gray-700 text-white">
-          <tr>
-            <th className="p-3">Item No</th>
-            <th className="p-3">Code No</th>
-            <th className="p-3">Description</th>
-            <th className="p-3">Unit</th>
-            <th className="p-3">Price (Rs.)</th>
-            <th className="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {labourData.map((labour) => (
-            <tr key={labour._id} className="border-b text-center hover:bg-gray-200">
-              <td className="p-3">{labour.Item_No}</td>
-              <td className="p-3">{labour.Code_no}</td>
-              <td className="p-3">
-                <input
-                  type="text"
-                  value={labour.description}
-                  onChange={(e) => updateLabour(labour._id, "description", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">{labour.unit}</td>
-              <td className="p-3">
-                <input
-                  type="number"
-                  value={labour.price}
-                  onChange={(e) => updateLabour(labour._id, "price", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <button onClick={() => deleteRow(labour._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
-                  Delete
-                </button>
-              </td>
+      {isLoading ? (
+        <div className="text-center">
+          <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+          <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+        </div>
+      ) : (
+        <table className="w-full mt-4 border bg-white shadow-md">
+          <thead className="bg-gray-700 text-white">
+            <tr>
+              <th className="p-3">Item No</th>
+              <th className="p-3">Code No</th>
+              <th className="p-3">Description</th>
+              <th className="p-3">Unit</th>
+              <th className="p-3">Price (Rs.)</th>
+              <th className="p-3">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {labourData.map((labour) => (
+              <tr key={labour._id} className="border-b text-center hover:bg-gray-200">
+                <td className="p-3">{labour.Item_No}</td>
+                <td className="p-3">{labour.Code_no}</td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={labour.description}
+                    onChange={(e) => updateLabour(labour._id, "description", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">{labour.unit}</td>
+                <td className="p-3">
+                  <input
+                    type="number"
+                    value={labour.price}
+                    onChange={(e) => updateLabour(labour._id, "price", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <button onClick={() => deleteRow(labour._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

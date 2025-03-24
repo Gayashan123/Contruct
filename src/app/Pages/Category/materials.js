@@ -119,55 +119,62 @@ export default function Materials() {
         </button>
       )}
 
-      <table className="w-full mt-4 border bg-white shadow-md">
-        <thead className="bg-gray-700 text-white">
-          <tr>
-            <th className="p-3">Item No</th>
-            <th className="p-3">Code No</th>
-            <th className="p-3">Description</th>
-            <th className="p-3">Unit</th>
-            <th className="p-3">Price (Rs.)</th>
-            <th className="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {materialsData.map((material) => (
-            <tr key={material._id} className="border-b text-center hover:bg-gray-200">
-              <td className="p-3">{material.Item_No}</td>
-              <td className="p-3">{material.Code_no}</td>
-              <td className="p-3">
-                <input
-                  type="text"
-                  value={material.description}
-                  onChange={(e) => updateMaterial(material._id, "description", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <input
-                  type="text"
-                  value={material.unit}
-                  onChange={(e) => updateMaterial(material._id, "unit", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <input
-                  type="number"
-                  value={material.price}
-                  onChange={(e) => updateMaterial(material._id, "price", e.target.value)}
-                  className="border p-2 w-full"
-                />
-              </td>
-              <td className="p-3">
-                <button onClick={() => deleteRow(material._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
-                  Delete
-                </button>
-              </td>
+      {isLoading ? (
+        <div className="text-center">
+          <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto"></div>
+          <p className="mt-4 text-xl text-gray-700">Loading data...</p>
+        </div>
+      ) : (
+        <table className="w-full mt-4 border bg-white shadow-md">
+          <thead className="bg-gray-700 text-white">
+            <tr>
+              <th className="p-3">Item No</th>
+              <th className="p-3">Code No</th>
+              <th className="p-3">Description</th>
+              <th className="p-3">Unit</th>
+              <th className="p-3">Price (Rs.)</th>
+              <th className="p-3">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {materialsData.map((material) => (
+              <tr key={material._id} className="border-b text-center hover:bg-gray-200">
+                <td className="p-3">{material.Item_No}</td>
+                <td className="p-3">{material.Code_no}</td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={material.description}
+                    onChange={(e) => updateMaterial(material._id, "description", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="text"
+                    value={material.unit}
+                    onChange={(e) => updateMaterial(material._id, "unit", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <input
+                    type="number"
+                    value={material.price}
+                    onChange={(e) => updateMaterial(material._id, "price", e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <button onClick={() => deleteRow(material._id)} className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

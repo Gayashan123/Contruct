@@ -1,66 +1,76 @@
-'use client ;'
+'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic'; // Import dynamic from Next.js
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
 import Image from 'next/image'; // Importing Next.js Image component
-import Contact from '../contact-us/page';
-import About from '../about-us/page';
 
+// Use dynamic imports for Contact and About components
+const Contact = dynamic(() => import('../contact-us/page'), {
+  loading: () => (
+    <div className="text-center text-gray-500 py-12">
+      <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto mb-4"></div>
+      <p>Loading Contact...</p>
+    </div>
+  ),
+});
+const About = dynamic(() => import('../about-us/page'), {
+  loading: () => (
+    <div className="text-center text-gray-500 py-12">
+      <div className="animate-spin border-t-4 border-blue-600 border-solid w-12 h-12 rounded-full mx-auto mb-4"></div>
+      <p>Loading About...</p>
+    </div>
+  ),
+});
 
 export default function Index() {
   return (
-    <div className="flex flex-col min-h-screen"> {/* Flex container with min height */}
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* Navbar */}
       <Navbar />
 
-      {/* Section with Image, Description, and Buttons */}
+      {/* Hero Section with Background Image */}
       <div className="relative flex-grow">
         <Image
-          src="/Images/civil.jpg" // Path to the image in the public folder
+          src="/Images/civil.jpg"
           alt="Civil Engineering"
-          width={1200} // Adjust the width as needed
-          height={600} // Adjust the height as needed
-          className="object-cover w-full h-96" // Make the image cover the available space
+          width={1920} // Larger resolution for quality
+          height={1080} // Adjusted to fit common screen sizes
+          className="object-cover w-full h-[400px] md:h-[600px]"
+          priority
         />
-
-        {/* Container for the text and buttons */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent flex flex-col justify-center items-center text-white z-10">
-          <h2 className="text-3xl font-bold mb-6 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent flex flex-col justify-center items-center text-white z-20 opacity-80">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-center z-30">
             Civil Engineering: Building the Future
           </h2>
-          <p className="text-lg mb-6 text-center max-w-3xl px-4 text-gray-300 leading-relaxed">
-            Civil engineering is a professional engineering discipline that deals with the design,
-            construction, and maintenance of the physical and naturally built environment, including
-            works like roads, bridges, dams, and buildings. Our team is committed to improving and
-            shaping the future of infrastructure.
+          <p className="text-lg md:text-xl mb-6 text-center max-w-3xl px-6 text-gray-300 leading-relaxed z-30">
+            Civil engineering is a professional discipline that focuses on the design, construction, and
+            maintenance of infrastructure such as roads, bridges, dams, and buildings. We are shaping the future
+            of urban development.
           </p>
-
-          <div className="flex justify-center space-x-4">
-            <button className="bg-blue-500 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+          <div className="flex justify-center space-x-6 z-30">
+            <button className="bg-blue-600 text-white py-3 px-10 rounded-lg hover:bg-blue-700 transition transform hover:scale-105 focus:outline-none shadow-md z-30">
               Learn More
             </button>
-            <button className="bg-green-500 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">
+            <button className="bg-green-600 text-white py-3 px-10 rounded-lg hover:bg-green-700 transition transform hover:scale-105 focus:outline-none shadow-md z-30">
               Our Services
             </button>
           </div>
         </div>
       </div>
 
-      {/* Spacing between Contact Us and About sections */}
-      <div className="my-16"> {/* Added margin for spacing */}
+      {/* Contact Section */}
+      <div className="my-16 px-4 md:px-12">
         <Contact />
       </div>
 
-      <div className="my-16"> {/* Added margin for spacing */}
+      {/* About Section */}
+      <div className="my-16 px-4 md:px-12">
         <About />
       </div>
 
-
-
-
-
-
-
+      {/* Footer */}
       <Footer />
     </div>
   );

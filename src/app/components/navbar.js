@@ -2,39 +2,49 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation'; // Importing usePathname for dynamic route detection
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
+  const pathname = usePathname(); // Using usePathname hook to get the current route
+
+  // Handle link click and close the mobile menu
+  const handleLinkClick = () => {
+    setIsMenuOpen(false); // Close the mobile menu after link click
+  };
+
+  // A helper function to determine if the current route matches the link
+  const isActiveLink = (path) => pathname === path;
 
   return (
-    <div className="bg-gray-800 text-white p-4 shadow-lg">
-      <div className="flex justify-between items-center">
+    <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white shadow-md">
+      <div className="container mx-auto flex justify-between items-center py-4 px-8">
         {/* Logo or brand name */}
-        <div className="text-xl font-bold cursor-pointer">
-          
+        <div className="text-2xl font-extrabold cursor-pointer">
+          <span className="text-white">MyBrand</span>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex space-x-6">
-          <ul className="flex space-x-6">
+        <div className="hidden md:flex space-x-10">
+          <ul className="flex space-x-10">
             <li>
-              <Link href="/">
-                <span className="cursor-pointer">Home</span>
+              <Link href="/" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/') ? 'blink' : 'hover:text-gray-300'}`}>
+                Home
               </Link>
             </li>
             <li>
-              <Link href="/pages/basic-prices">
-                <span className="cursor-pointer">Basic Prices</span>
+              <Link href="/pages/basic-prices" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/basic-prices') ? 'blink' : 'hover:text-gray-300'}`}>
+                Basic Prices
               </Link>
             </li>
             <li>
-              <Link href="/pages/basic-rates">
-                <span className="cursor-pointer">Basic Rates</span>
+              <Link href="/pages/basic-rates" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/basic-rates') ? 'blink' : 'hover:text-gray-300'}`}>
+                Basic Rates
               </Link>
             </li>
             <li>
-              <Link href="/pages/activities">
-                <span className="cursor-pointer">Activities</span>
+              <Link href="/pages/activities" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/activities') ? 'blink' : 'hover:text-gray-300'}`}>
+                Activities
               </Link>
             </li>
           </ul>
@@ -48,7 +58,7 @@ export default function Navbar() {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-8 w-8"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -68,31 +78,30 @@ export default function Navbar() {
       {/* Mobile Navigation */}
       <div
         className={`${
-          isMenuOpen ? 'block' : 'hidden'
-        } md:hidden mt-4 space-y-4 transition-all duration-300 ease-in-out`}
+          isMenuOpen ? 'opacity-100 visibility-visible' : 'opacity-0 visibility-hidden'
+        } md:hidden mt-6 space-y-4 px-6 transition-opacity duration-300 ease-in-out`} // Improved transition with opacity
       >
         <ul className="flex flex-col space-y-4">
           <li>
-            <Link href="/" onClick={() => setIsMenuOpen(false)}>
-              <span className="cursor-pointer">Home</span>
+            <Link href="/" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/') ? 'blink' : 'hover:text-gray-300'}`}>
+              Home
             </Link>
           </li>
           <li>
-            <Link href="/pages/basic-prices" onClick={() => setIsMenuOpen(false)}>
-              <span className="cursor-pointer">Basic Prices</span>
+            <Link href="/pages/basic-prices" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/basic-prices') ? 'blink' : 'hover:text-gray-300'}`}>
+              Basic Prices
             </Link>
           </li>
           <li>
-            <Link href="/pages/basic-rates" onClick={() => setIsMenuOpen(false)}>
-              <span className="cursor-pointer">Basic Rates</span>
+            <Link href="/pages/basic-rates" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/basic-rates') ? 'blink' : 'hover:text-gray-300'}`}>
+              Basic Rates
             </Link>
           </li>
           <li>
-            <Link href="/pages/activities" onClick={() => setIsMenuOpen(false)}>
-              <span className="cursor-pointer">Activities</span>
+            <Link href="/pages/activities" onClick={handleLinkClick} className={`cursor-pointer text-lg font-semibold transition duration-300 ${isActiveLink('/pages/activities') ? 'blink' : 'hover:text-gray-300'}`}>
+              Activities
             </Link>
           </li>
-         
         </ul>
       </div>
     </div>
